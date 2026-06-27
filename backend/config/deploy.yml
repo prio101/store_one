@@ -9,9 +9,6 @@ servers:
     options:
       publish: "127.0.0.1:3000:3000"
 
-proxy:
-  app_port: 3000
-
 registry:
   server: ghcr.io
   username: prio101
@@ -65,24 +62,5 @@ accessories:
         MEILI_NO_ANALYTICS: "true"
     directories:
       - data:/meili_data
-
-  storefront:
-    image: ghcr.io/prio101/store-one-storefront
-    host: 157.245.146.187
-    port: "127.0.0.1:3001:3001"
-    options:
-      add-host: "host.docker.internal:host-gateway"
-    env:
-      clear:
-        NODE_ENV: production
-        PORT: "3001"
-        HOSTNAME: "0.0.0.0"
-        SPREE_API_URL: "http://host.docker.internal:3000"
-      secret:
-        - SPREE_PUBLISHABLE_KEY
-        - NEXT_PUBLIC_DEFAULT_COUNTRY
-        - NEXT_PUBLIC_DEFAULT_LOCALE
-        - NEXT_PUBLIC_SITE_URL
-        - NEXT_PUBLIC_STORE_NAME
 
 asset_path: /rails/public/assets

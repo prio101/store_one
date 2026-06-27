@@ -11,3 +11,6 @@ node_modules/
 
 # Backend environment
 backend/.env
+
+# Production env on server (contains secrets)
+.env

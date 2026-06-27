@@ -120,6 +120,17 @@ SPREE_API_KEY=sk_... npx spree api post products --data '{"name":"New product","
 > spree api get products
 > ```
 
+## Production Server Setup
+
+SSH into the VPS and create `/opt/store_one/.env`:
+
+
+Then deploy:
+
+```bash
+make deploy-full
+```
+
 ## Learn More
 
 - [Spree Documentation](https://spreecommerce.org/docs)

@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 REMOTE_HOST="root@157.245.146.187"
+REMOTE_DIR="/opt/store_one"
 TUNNEL_PORT=13000
+BACKEND_IMAGE="ghcr.io/prio101/store-one:latest"
 STOREFRONT_IMAGE="ghcr.io/prio101/store-one-storefront:latest"
 TUNNEL_PID=""
 
 # Source secrets into environment
-if [ -f .kamal/secrets ]; then
+if [ -f backend/.kamal/secrets ]; then
   set -a
-  source .kamal/secrets
+  source backend/.kamal/secrets
   set +a
 fi
 
@@ -29,111 +31,182 @@ echo "======================================================"
 # ── Step 1: Login to GitHub Container Registry ──────────────────
 echo ""
 echo "🔐 Step 1: Logging into GitHub Container Registry..."
-bundle exec kamal registry login
+docker login ghcr.io -u prio101 -p "${KAMAL_REGISTRY_PASSWORD}"
 
-# ── Step 2: Deploy Rails backend ────────────────────────────────
+# ── Step 2: Build and push backend image ───────────────────────
 echo ""
-echo "🚂 Step 2: Deploying Rails backend..."
-bundle exec kamal deploy
+echo "📦 Step 2: Building backend image..."
+docker build \
+  --platform linux/amd64 \
+  -t "${BACKEND_IMAGE}" \
+  ./backend
 
-# ── Step 3: Start SSH tunnel to Rails API ───────────────────────
+echo "📤 Pushing backend image..."
+docker push "${BACKEND_IMAGE}"
+
+# ── Step 3: Prepare server (clean up old proxies) ──────────────
 echo ""
-echo "🔌 Step 3: Starting SSH tunnel to Rails API..."
-ssh -f -N -o ConnectTimeout=10 -L "${TUNNEL_PORT}:127.0.0.1:3000" "${REMOTE_HOST}"
-TUNNEL_PID=$!
-sleep 2
+echo "🖥️  Step 3: Preparing server..."
+ssh "${REMOTE_HOST}" << 'PREP_SCRIPT'
+  # Stop host-level nginx (conflicts with Docker nginx on ports 80/443)
+  if systemctl is-active --quiet nginx 2>/dev/null; then
+    systemctl stop nginx
+    systemctl disable nginx
+    echo "✅ Host nginx stopped and disabled"
+  fi
 
-# Verify tunnel is alive
-if ! kill -0 "${TUNNEL_PID}" 2>/dev/null; then
-  echo "❌ SSH tunnel failed to start"
-  exit 1
-fi
+  # Remove old nginx configs from previous deploys
+  rm -f /etc/nginx/sites-available/minimeshop
+  rm -f /etc/nginx/sites-enabled/minimeshop
 
-# ── Step 4: Wait for Rails API ──────────────────────────────────
+  # Stop all Kamal-managed containers (they hold ports 3000, etc.)
+  # Use 'docker ps -q' (all running) then selectively stop — safer than label filters
+  # which may not match all legacy containers.
+  for cid in $(docker ps -q 2>/dev/null); do
+    container_name=$(docker inspect --format '{{.Name}}' "$cid" 2>/dev/null | sed 's/^\///')
+    # Skip containers that belong to our docker-compose project
+    if echo "$container_name" | grep -q "^store_one-"; then
+      continue
+    fi
+    docker stop "$cid" 2>/dev/null || true
+    docker rm "$cid" 2>/dev/null || true
+    echo "  Stopped: $container_name"
+  done
+  echo "✅ Old containers stopped"
+
+  mkdir -p /opt/store_one/config/nginx
+PREP_SCRIPT
+
+scp docker-compose.prod.yml "${REMOTE_HOST}:${REMOTE_DIR}/docker-compose.prod.yml"
+scp config/nginx/nginx-init.conf "${REMOTE_HOST}:${REMOTE_DIR}/config/nginx/nginx.conf"
+
+# ── Step 4: Start backend services on server ───────────────────
 echo ""
-echo "⏳ Step 4: Waiting for Rails API to be ready..."
+echo "🚂 Step 4: Starting backend services on server..."
+
+# Generate .env from sourced secrets (no hardcoded values)
+cat > /tmp/store-one.env << EOF
+SECRET_KEY_BASE=${SECRET_KEY_BASE}
+DATABASE_URL=${DATABASE_URL}
+JWT_SECRET_KEY=${JWT_SECRET_KEY}
+DO_SPACES_KEY=${DO_SPACES_KEY}
+DO_SPACES_SECRET=${DO_SPACES_SECRET}
+DO_SPACES_BUCKET=${DO_SPACES_BUCKET}
+DO_SPACES_REGION=${DO_SPACES_REGION}
+SPREE_PUBLISHABLE_KEY=${SPREE_PUBLISHABLE_KEY}
+NEXT_PUBLIC_DEFAULT_COUNTRY=${NEXT_PUBLIC_DEFAULT_COUNTRY:-bd}
+NEXT_PUBLIC_DEFAULT_LOCALE=${NEXT_PUBLIC_DEFAULT_LOCALE:-en}
+NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://minimeshop.net}
+NEXT_PUBLIC_STORE_NAME=${NEXT_PUBLIC_STORE_NAME:-MiniMe Shop}
+EOF
+
+scp /tmp/store-one.env "${REMOTE_HOST}:${REMOTE_DIR}/.env"
+rm -f /tmp/store-one.env
+
+ssh "${REMOTE_HOST}" << 'START_SCRIPT'
+  cd /opt/store_one
+  docker compose -f docker-compose.prod.yml pull postgres redis meilisearch web worker
+  docker compose -f docker-compose.prod.yml up -d postgres redis meilisearch web worker
+START_SCRIPT
+
+# ── Step 5: Wait for backend to be healthy ─────────────────────
+echo ""
+echo "⏳ Step 5: Waiting for backend API to be ready..."
 for i in $(seq 1 30); do
-  if curl -sf "http://127.0.0.1:${TUNNEL_PORT}/up" > /dev/null 2>&1; then
-    echo "✅ API is ready"
+  if ssh "${REMOTE_HOST}" "curl -sf http://127.0.0.1:3000/up" > /dev/null 2>&1; then
+    echo "✅ Backend API is ready"
     break
   fi
   if [ "$i" -eq 30 ]; then
-    echo "❌ API not reachable after 60s — aborting"
+    echo "❌ Backend API not reachable after 60s — aborting"
     exit 1
   fi
   sleep 2
 done
 
-# ── Step 5: Build storefront image locally ──────────────────────
+# ── Step 6: Start SSH tunnel to backend API ─────────────────────
 echo ""
-echo "📦 Step 5: Building storefront image locally..."
-cd ../apps/storefront
+echo "🔌 Step 6: Starting SSH tunnel to backend API..."
+ssh -N -o ConnectTimeout=10 -L "${TUNNEL_PORT}:127.0.0.1:3000" "${REMOTE_HOST}" &
+TUNNEL_PID=$!
+sleep 2
 
+if ! kill -0 "${TUNNEL_PID}" 2>/dev/null; then
+  echo "❌ SSH tunnel failed to start"
+  exit 1
+fi
+echo "✅ Tunnel running (PID ${TUNNEL_PID})"
+
+# ── Step 7: Build and push storefront image ─────────────────────
+echo ""
+echo "📦 Step 7: Building storefront image..."
 docker build \
   --network=host \
   --build-arg SPREE_API_URL="http://127.0.0.1:${TUNNEL_PORT}" \
   --build-arg SPREE_PUBLISHABLE_KEY="${SPREE_PUBLISHABLE_KEY}" \
   -t "${STOREFRONT_IMAGE}" \
-  .
+  ./apps/storefront
 
-cd ../../backend
-
-# ── Step 6: Push storefront image to GHCR ───────────────────────
-echo ""
-echo "📤 Step 6: Pushing storefront image to GHCR..."
+echo "📤 Pushing storefront image..."
 docker push "${STOREFRONT_IMAGE}"
 
-# ── Step 7: Stop SSH tunnel ─────────────────────────────────────
+# ── Step 8: Stop SSH tunnel ────────────────────────────────────
 echo ""
-echo "🔌 Step 7: Stopping SSH tunnel..."
+echo "🔌 Step 8: Stopping SSH tunnel..."
 kill "${TUNNEL_PID}" 2>/dev/null || true
 wait "${TUNNEL_PID}" 2>/dev/null || true
 TUNNEL_PID=""
 
-# ── Step 8: Deploy storefront accessory ─────────────────────────
+# ── Step 9: SSL with Certbot ──────────────────────────────────
 echo ""
-echo "🛍️  Step 8: Deploying storefront accessory..."
-bundle exec kamal accessory boot storefront
-
-# ── Step 9: Configure Nginx on server ───────────────────────────
-echo ""
-echo "🌐 Step 9: Configuring Nginx on server..."
-scp config/nginx.conf "${REMOTE_HOST}:/tmp/nginx.conf"
-
-ssh "${REMOTE_HOST}" << 'REMOTE_SCRIPT'
-  if ! command -v nginx &> /dev/null; then
-    apt-get update
-    apt-get install -y nginx
-  fi
-
-  cp /tmp/nginx.conf /etc/nginx/sites-available/minimeshop
-  ln -sf /etc/nginx/sites-available/minimeshop /etc/nginx/sites-enabled/minimeshop
-  rm -f /etc/nginx/sites-enabled/default
-
-  nginx -t
-  systemctl reload nginx
-
-  echo "✅ Nginx configured and reloaded"
-REMOTE_SCRIPT
-
-# ── Step 10: SSL with Certbot ──────────────────────────────────
-echo ""
-echo "🔒 Step 10: Setting up SSL..."
+echo "🔒 Step 9: Setting up SSL..."
 ssh "${REMOTE_HOST}" << 'SSL_SCRIPT'
   if ! command -v certbot &> /dev/null; then
-    apt-get install -y certbot python3-certbot-nginx
+    apt-get update
+    apt-get install -y certbot
   fi
 
-  certbot --nginx -d minimeshop.net -d www.minimeshop.net \
-    --non-interactive --agree-tos --email admin@minimeshop.net \
-    --redirect || echo "⚠️  SSL setup may need manual intervention"
+  # Get certificates if they don't exist
+  if [ ! -d /etc/letsencrypt/live/minimeshop.net ]; then
+    # Stop nginx temporarily so port 80 is free for standalone mode
+    cd /opt/store_one
+    docker compose -f docker-compose.prod.yml stop nginx
 
-  echo "✅ SSL configured"
+    certbot certonly --standalone \
+      -d minimeshop.net -d www.minimeshop.net \
+      --non-interactive --agree-tos --email admin@minimeshop.net \
+      --http-01-port 80 || echo "⚠️  SSL setup may need manual intervention"
+
+    echo "✅ SSL certificates obtained"
+  else
+    echo "✅ SSL certificates already exist"
+  fi
 SSL_SCRIPT
+
+# ── Step 10: Switch to SSL nginx config and start all services ─
+echo ""
+echo "🌐 Step 10: Switching to SSL nginx config and starting all services..."
+scp config/nginx/nginx.conf "${REMOTE_HOST}:${REMOTE_DIR}/config/nginx/nginx.conf"
+
+ssh "${REMOTE_HOST}" << 'FINAL_SCRIPT'
+  cd /opt/store_one
+  docker compose -f docker-compose.prod.yml up -d
+  echo "✅ All services started"
+FINAL_SCRIPT
+
+# ── Step 11: Set up certbot auto-renewal ───────────────────────
+echo ""
+echo "🔄 Step 11: Setting up certbot auto-renewal..."
+ssh "${REMOTE_HOST}" << 'RENEW_SCRIPT'
+  # Add cron job for certbot renewal (twice daily)
+  CRON_LINE="0 0,12 * * * certbot renew --quiet --deploy-hook 'cd /opt/store_one && docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload'"
+  (crontab -l 2>/dev/null | grep -v 'certbot renew'; echo "${CRON_LINE}") | crontab -
+  echo "✅ Certbot auto-renewal configured"
+RENEW_SCRIPT
 
 echo ""
 echo "✅ Deployment complete!"
 echo ""
-echo "🌐 Your store is live at: https://minimeshop.net"
-echo "🔧 Rails admin at: https://minimeshop.net/admin"
-echo "📡 API at: https://minimeshop.net/api"
+echo "🌐 Storefront: https://minimeshop.net"
+echo "🔧 Admin:      https://minimeshop.net/admin"
+echo "📡 API:         https://minimeshop.net/api"

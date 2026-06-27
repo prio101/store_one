@@ -1,0 +1,125 @@
+# Production: single compose file for the full stack.
+# Run on the server with:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Images are pushed to GHCR by deploy-full; this file pulls them.
+# Nginx terminates TLS (certbot certs mounted from host).
+
+x-app: &app
+  image: ghcr.io/prio101/store-one:${BACKEND_TAG:-latest}
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    meilisearch:
+      condition: service_healthy
+  env_file: .env
+  environment: &app-env
+    DATABASE_URL: postgres://postgres@postgres:5432/spree_production
+    REDIS_URL: redis://redis:6379/0
+    SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+    RAILS_FORCE_SSL: "false"
+    RAILS_ASSUME_SSL: "false"
+    MEILISEARCH_URL: http://meilisearch:7700
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "true"
+    RAILS_SERVE_STATIC_FILES: "true"
+    ACTIVE_STORAGE_SERVICE: amazon
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+    depends_on:
+      - web
+      - storefront
+    restart: unless-stopped
+
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - storage_data:/rails/storage
+    healthcheck:
+      test: curl -f http://localhost:3000/up || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  worker:
+    <<: *app
+    command: bundle exec sidekiq
+    environment:
+      <<: *app-env
+      RAILS_MAX_THREADS: ${SIDEKIQ_DB_POOL:-27}
+    volumes:
+      - storage_data:/rails/storage
+    restart: unless-stopped
+
+  storefront:
+    image: ghcr.io/prio101/store-one-storefront:${STOREFRONT_TAG:-latest}
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      HOSTNAME: "0.0.0.0"
+      SPREE_API_URL: http://web:3000
+      SPREE_PUBLISHABLE_KEY: ${SPREE_PUBLISHABLE_KEY}
+      NEXT_PUBLIC_DEFAULT_COUNTRY: ${NEXT_PUBLIC_DEFAULT_COUNTRY:-us}
+      NEXT_PUBLIC_DEFAULT_LOCALE: ${NEXT_PUBLIC_DEFAULT_LOCALE:-en}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://minimeshop.net}
+      NEXT_PUBLIC_STORE_NAME: ${NEXT_PUBLIC_STORE_NAME:-"MiniMe Shop"}
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGDATA: /var/lib/postgresql/18/docker
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    volumes:
+      - meilisearch_data:/meili_data
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    healthcheck:
+      test: curl -f http://localhost:7700/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  meilisearch_data:
+  storage_data:
