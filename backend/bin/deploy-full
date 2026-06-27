@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+REMOTE_HOST="root@157.245.146.187"
+TUNNEL_PORT=13000
+STOREFRONT_IMAGE="ghcr.io/prio101/store-one-storefront:latest"
+TUNNEL_PID=""
+
+# Source secrets into environment
+if [ -f .kamal/secrets ]; then
+  set -a
+  source .kamal/secrets
+  set +a
+fi
+
+cleanup() {
+  if [ -n "${TUNNEL_PID}" ]; then
+    kill "${TUNNEL_PID}" 2>/dev/null || true
+    wait "${TUNNEL_PID}" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
+echo "🚀 Full deployment: Rails backend + Next.js storefront"
+echo "======================================================"
+
+# ── Step 1: Login to GitHub Container Registry ──────────────────
+echo ""
+echo "🔐 Step 1: Logging into GitHub Container Registry..."
+bundle exec kamal registry login
+
+# ── Step 2: Deploy Rails backend ────────────────────────────────
+echo ""
+echo "🚂 Step 2: Deploying Rails backend..."
+bundle exec kamal deploy
+
+# ── Step 3: Start SSH tunnel to Rails API ───────────────────────
+echo ""
+echo "🔌 Step 3: Starting SSH tunnel to Rails API..."
+ssh -f -N -o ConnectTimeout=10 -L "${TUNNEL_PORT}:127.0.0.1:3000" "${REMOTE_HOST}"
+TUNNEL_PID=$!
+sleep 2
+
+# Verify tunnel is alive
+if ! kill -0 "${TUNNEL_PID}" 2>/dev/null; then
+  echo "❌ SSH tunnel failed to start"
+  exit 1
+fi
+
+# ── Step 4: Wait for Rails API ──────────────────────────────────
+echo ""
+echo "⏳ Step 4: Waiting for Rails API to be ready..."
+for i in $(seq 1 30); do
+  if curl -sf "http://127.0.0.1:${TUNNEL_PORT}/up" > /dev/null 2>&1; then
+    echo "✅ API is ready"
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    echo "❌ API not reachable after 60s — aborting"
+    exit 1
+  fi
+  sleep 2
+done
+
+# ── Step 5: Build storefront image locally ──────────────────────
+echo ""
+echo "📦 Step 5: Building storefront image locally..."
+cd ../apps/storefront
+
+docker build \
+  --network=host \
+  --build-arg SPREE_API_URL="http://127.0.0.1:${TUNNEL_PORT}" \
+  --build-arg SPREE_PUBLISHABLE_KEY="${SPREE_PUBLISHABLE_KEY}" \
+  -t "${STOREFRONT_IMAGE}" \
+  .
+
+cd ../../backend
+
+# ── Step 6: Push storefront image to GHCR ───────────────────────
+echo ""
+echo "📤 Step 6: Pushing storefront image to GHCR..."
+docker push "${STOREFRONT_IMAGE}"
+
+# ── Step 7: Stop SSH tunnel ─────────────────────────────────────
+echo ""
+echo "🔌 Step 7: Stopping SSH tunnel..."
+kill "${TUNNEL_PID}" 2>/dev/null || true
+wait "${TUNNEL_PID}" 2>/dev/null || true
+TUNNEL_PID=""
+
+# ── Step 8: Deploy storefront accessory ─────────────────────────
+echo ""
+echo "🛍️  Step 8: Deploying storefront accessory..."
+bundle exec kamal accessory boot storefront
+
+# ── Step 9: Configure Nginx on server ───────────────────────────
+echo ""
+echo "🌐 Step 9: Configuring Nginx on server..."
+scp config/nginx.conf "${REMOTE_HOST}:/tmp/nginx.conf"
+
+ssh "${REMOTE_HOST}" << 'REMOTE_SCRIPT'
+  if ! command -v nginx &> /dev/null; then
+    apt-get update
+    apt-get install -y nginx
+  fi
+
+  cp /tmp/nginx.conf /etc/nginx/sites-available/minimeshop
+  ln -sf /etc/nginx/sites-available/minimeshop /etc/nginx/sites-enabled/minimeshop
+  rm -f /etc/nginx/sites-enabled/default
+
+  nginx -t
+  systemctl reload nginx
+
+  echo "✅ Nginx configured and reloaded"
+REMOTE_SCRIPT
+
+# ── Step 10: SSL with Certbot ──────────────────────────────────
+echo ""
+echo "🔒 Step 10: Setting up SSL..."
+ssh "${REMOTE_HOST}" << 'SSL_SCRIPT'
+  if ! command -v certbot &> /dev/null; then
+    apt-get install -y certbot python3-certbot-nginx
+  fi
+
+  certbot --nginx -d minimeshop.net -d www.minimeshop.net \
+    --non-interactive --agree-tos --email admin@minimeshop.net \
+    --redirect || echo "⚠️  SSL setup may need manual intervention"
+
+  echo "✅ SSL configured"
+SSL_SCRIPT
+
+echo ""
+echo "✅ Deployment complete!"
+echo ""
+echo "🌐 Your store is live at: https://minimeshop.net"
+echo "🔧 Rails admin at: https://minimeshop.net/admin"
+echo "📡 API at: https://minimeshop.net/api"

@@ -31,6 +31,9 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
+# Kamal secrets (contain credentials)
+.kamal/secrets
+
 # Ignore node_modules
 /node_modules
 

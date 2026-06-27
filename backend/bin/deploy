@@ -1,0 +1,83 @@
+#!/bin/bash
+set -euo pipefail
+
+# ── MiniMeShop Deploy Script ─────────────────────────────────────
+# Usage:
+#   bin/deploy              # Deploy latest
+#   bin/deploy setup        # First-time server setup (boot accessories)
+#   bin/deploy status       # Check deployment status
+#   bin/deploy logs         # Stream logs
+#   bin/deploy console      # Rails console
+#   bin/deploy rollback     # Rollback to previous version
+#   bin/deploy db:migrate   # Run database migrations
+#   bin/deploy db:setup     # Prepare database (create + migrate)
+#   bin/deploy seed         # Seed the database
+#   bin/deploy accessories  # Boot all accessories
+#   bin/deploy rebuild      # Rebuild and deploy
+
+APP_NAME="minimeshop"
+CMD="${1:-deploy}"
+
+cd "$(dirname "$0")/.."
+
+case "$CMD" in
+  setup)
+    echo "🔧 Setting up server accessories..."
+    kamal accessory boot db
+    kamal accessory boot redis
+    kamal accessory boot meilisearch
+    echo "✅ All accessories booted"
+    ;;
+
+  deploy|d)
+    echo "🚀 Deploying $APP_NAME..."
+    kamal deploy
+    ;;
+
+  status|s)
+    kamal status
+    ;;
+
+  logs|l)
+    kamal logs -s 100
+    ;;
+
+  console|c)
+    kamal app exec -i "bin/rails console"
+    ;;
+
+  rollback|r)
+    echo "⏪ Rolling back $APP_NAME..."
+    kamal rollback
+    ;;
+
+  db:migrate)
+    echo "🗄️  Running migrations..."
+    kamal app exec "bin/rails db:migrate"
+    ;;
+
+  db:setup)
+    echo "🗄️  Setting up database..."
+    kamal app exec "bin/rails db:prepare"
+    ;;
+
+  seed)
+    echo "🌱 Seeding database..."
+    kamal app exec "bin/rails db:seed"
+    ;;
+
+  accessories|acc)
+    echo "🔌 Booting all accessories..."
+    kamal accessory boot all
+    ;;
+
+  rebuild|rb)
+    echo "🔨 Rebuilding and deploying..."
+    kamal deploy --deploy-timeout=30m
+    ;;
+
+  *)
+    echo "Usage: bin/deploy {deploy|setup|status|logs|console|rollback|db:migrate|db:setup|seed|accessories|rebuild}"
+    exit 1
+    ;;
+esac

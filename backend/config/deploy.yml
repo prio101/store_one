@@ -1,0 +1,88 @@
+service: minimeshop
+
+image: prio101/store-one
+
+servers:
+  web:
+    hosts:
+      - 157.245.146.187
+    options:
+      publish: "127.0.0.1:3000:3000"
+
+proxy:
+  app_port: 3000
+
+registry:
+  server: ghcr.io
+  username: prio101
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "true"
+    RAILS_SERVE_STATIC_FILES: "true"
+    REDIS_URL: redis://minimeshop-redis:6379/0
+    MEILISEARCH_URL: http://minimeshop-meilisearch:7700
+    ACTIVE_STORAGE_SERVICE: amazon
+  secret:
+    - DATABASE_URL
+    - SECRET_KEY_BASE
+    - JWT_SECRET_KEY
+    - DO_SPACES_KEY
+    - DO_SPACES_SECRET
+    - DO_SPACES_BUCKET
+    - DO_SPACES_REGION
+
+accessories:
+  db:
+    image: postgres:18-alpine
+    host: 157.245.146.187
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_HOST_AUTH_METHOD: trust
+    directories:
+      - data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    host: 157.245.146.187
+    port: "127.0.0.1:6379:6379"
+    directories:
+      - data:/data
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    host: 157.245.146.187
+    port: "127.0.0.1:7700:7700"
+    env:
+      clear:
+        MEILI_NO_ANALYTICS: "true"
+    directories:
+      - data:/meili_data
+
+  storefront:
+    image: ghcr.io/prio101/store-one-storefront
+    host: 157.245.146.187
+    port: "127.0.0.1:3001:3001"
+    options:
+      add-host: "host.docker.internal:host-gateway"
+    env:
+      clear:
+        NODE_ENV: production
+        PORT: "3001"
+        HOSTNAME: "0.0.0.0"
+        SPREE_API_URL: "http://host.docker.internal:3000"
+      secret:
+        - SPREE_PUBLISHABLE_KEY
+        - NEXT_PUBLIC_DEFAULT_COUNTRY
+        - NEXT_PUBLIC_DEFAULT_LOCALE
+        - NEXT_PUBLIC_SITE_URL
+        - NEXT_PUBLIC_STORE_NAME
+
+asset_path: /rails/public/assets

@@ -1,0 +1,4 @@
+# Kamal env — non-secret environment variables for accessories
+# Loaded automatically by kamal on accessory boot
+
+MEILI_NO_ANALYTICS=true
