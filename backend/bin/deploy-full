@@ -190,7 +190,9 @@ scp config/nginx/nginx.conf "${REMOTE_HOST}:${REMOTE_DIR}/config/nginx/nginx.con
 
 ssh "${REMOTE_HOST}" << 'FINAL_SCRIPT'
   cd /opt/store_one
+  docker compose -f docker-compose.prod.yml pull storefront
   docker compose -f docker-compose.prod.yml up -d
+  docker compose -f docker-compose.prod.yml restart nginx
   echo "✅ All services started"
 FINAL_SCRIPT
 
