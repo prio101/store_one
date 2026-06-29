@@ -3,7 +3,7 @@ import type messages from "../../messages/en.json";
 type Messages = typeof messages;
 
 declare global {
-  type Locale = "en" | "de" | "pl" | "es" | "fr";
+  type Locale = "en" | "de" | "pl" | "es" | "fr" | "bn";
   interface IntlMessages extends Messages {}
 }
 

@@ -1,0 +1,320 @@
+/*
+ * Component-Specific Styles
+ * Custom CSS for components that need more than Tailwind utilities
+ */
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+/* Primary Button - Peach */
+.btn-primary {
+  background-color: var(--peach-500);
+  color: var(--white);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--peach-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 145, 102, 0.3);
+}
+
+.btn-primary:active {
+  background-color: var(--peach-700);
+  transform: translateY(0);
+}
+
+/* Secondary Button - Warm Blue */
+.btn-secondary {
+  background-color: var(--warmblue-500);
+  color: var(--white);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--warmblue-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(91, 155, 213, 0.3);
+}
+
+.btn-secondary:active {
+  background-color: var(--warmblue-700);
+  transform: translateY(0);
+}
+
+/* Outline Button */
+.btn-outline {
+  background-color: transparent;
+  color: var(--peach-500);
+  border: 2px solid var(--peach-500);
+  transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: var(--peach-500);
+  color: var(--white);
+}
+
+/* Ghost Button */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--gray-700);
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background-color: var(--peach-100);
+  color: var(--peach-700);
+}
+
+/* ============================================
+   CARD STYLES
+   ============================================ */
+
+.card {
+  background-color: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--peach-300);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-elevated {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================
+   HEADER STYLES
+   ============================================ */
+
+.header {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.header-logo {
+  color: var(--black);
+  font-weight: 700;
+}
+
+.header-nav-link {
+  color: var(--gray-700);
+  transition: color 0.2s ease;
+}
+
+.header-nav-link:hover {
+  color: var(--peach-500);
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+.hero-section {
+  background: linear-gradient(135deg, var(--peach-100) 0%, var(--warmblue-100) 100%);
+}
+
+.hero-cta-primary {
+  background-color: var(--peach-500);
+  color: var(--white);
+}
+
+.hero-cta-primary:hover {
+  background-color: var(--peach-600);
+}
+
+.hero-cta-secondary {
+  background-color: var(--warmblue-500);
+  color: var(--white);
+}
+
+.hero-cta-secondary:hover {
+  background-color: var(--warmblue-600);
+}
+
+/* ============================================
+   FOOTER STYLES
+   ============================================ */
+
+.footer {
+  background-color: var(--gray-900);
+  color: var(--white);
+}
+
+.footer-heading {
+  color: var(--peach-400);
+}
+
+.footer-link {
+  color: var(--gray-400);
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: var(--peach-400);
+}
+
+/* ============================================
+   PRODUCT CARD STYLES
+   ============================================ */
+
+.product-card {
+  background-color: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  border-color: var(--peach-300);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.product-card-image {
+  background-color: var(--gray-100);
+}
+
+.product-card-title {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.product-card-price {
+  color: var(--peach-600);
+  font-weight: 700;
+}
+
+/* ============================================
+   FORM STYLES
+   ============================================ */
+
+.input-field {
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
+  color: var(--black);
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--peach-400);
+  box-shadow: 0 0 0 3px rgba(255, 145, 102, 0.15);
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--gray-400);
+}
+
+/* ============================================
+   BADGE STYLES
+   ============================================ */
+
+.badge-peach {
+  background-color: var(--peach-100);
+  color: var(--peach-700);
+}
+
+.badge-blue {
+  background-color: var(--warmblue-100);
+  color: var(--warmblue-700);
+}
+
+.badge-success {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-warning {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badge-error {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+/* ============================================
+   LINK STYLES
+   ============================================ */
+
+.link-primary {
+  color: var(--peach-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.link-primary:hover {
+  color: var(--peach-700);
+}
+
+.link-secondary {
+  color: var(--warmblue-500);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.link-secondary:hover {
+  color: var(--warmblue-700);
+}
+
+/* ============================================
+   DIVIDER STYLES
+   ============================================ */
+
+.divider {
+  border-color: var(--gray-200);
+}
+
+.divider-peach {
+  border-color: var(--peach-200);
+}
+
+/* ============================================
+   SCROLLBAR STYLES
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* ============================================
+   SELECTION STYLES
+   ============================================ */
+
+::selection {
+  background-color: var(--peach-200);
+  color: var(--black);
+}
+
+/* ============================================
+   FOCUS STYLES
+   ============================================ */
+
+:focus-visible {
+  outline: 2px solid var(--peach-400);
+  outline-offset: 2px;
+}

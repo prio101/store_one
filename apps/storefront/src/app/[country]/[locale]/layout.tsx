@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider, type Locale } from "next-intl";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Toaster } from "@/components/ui/sonner";
@@ -16,6 +16,7 @@ import enMessages from "../../../../messages/en.json";
 import esMessages from "../../../../messages/es.json";
 import frMessages from "../../../../messages/fr.json";
 import plMessages from "../../../../messages/pl.json";
+import bnMessages from "../../../../messages/bn.json";
 
 const messagesMap: Record<string, IntlMessages> = {
   en: enMessages,
@@ -23,6 +24,7 @@ const messagesMap: Record<string, IntlMessages> = {
   es: esMessages,
   fr: frMessages,
   pl: plMessages,
+  bn: bnMessages,
 };
 
 interface CountryLocaleLayoutProps {
@@ -73,7 +75,7 @@ export default async function CountryLocaleLayout({
   return (
     <NextIntlClientProvider
       messages={messages}
-      locale={locale as "en" | "de" | "pl"}
+      locale={locale as Locale}
     >
       <StoreProvider
         initialCountry={country}
