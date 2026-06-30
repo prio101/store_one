@@ -112,7 +112,7 @@ services:
     environment:
       MEILI_NO_ANALYTICS: "true"
     healthcheck:
-      test: curl -f http://localhost:7700/health || exit 1
+      test: wget -qO- http://localhost:7700/health || exit 1
       interval: 5s
       timeout: 5s
       retries: 5
