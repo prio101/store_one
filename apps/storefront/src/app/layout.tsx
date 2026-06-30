@@ -7,6 +7,8 @@ import "./globals.css";
 import { Suspense } from "react";
 import { getStoreDescription, getStoreName } from "@/lib/store";
 
+const isVercel = !!process.env.VERCEL;
+
 const gtmId = process.env.GTM_ID;
 const spreeApiOrigin = (() => {
   try {
@@ -54,8 +56,8 @@ export default function RootLayout({
         className={`${geist.variable} antialiased min-h-screen flex flex-col`}
       >
         <Suspense fallback={null}>{children}</Suspense>
-        <Analytics />
-        <SpeedInsights />
+        {isVercel && <Analytics />}
+        {isVercel && <SpeedInsights />}
       </body>
     </html>
   );
