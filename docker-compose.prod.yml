@@ -13,7 +13,7 @@ x-app: &app
     redis:
       condition: service_healthy
     meilisearch:
-      condition: service_healthy
+      condition: service_started
   env_file: .env
   environment: &app-env
     DATABASE_URL: postgres://postgres@postgres:5432/spree_production
@@ -111,11 +111,6 @@ services:
       - meilisearch_data:/meili_data
     environment:
       MEILI_NO_ANALYTICS: "true"
-    healthcheck:
-      test: wget -qO- http://localhost:7700/health || exit 1
-      interval: 5s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
 volumes:
