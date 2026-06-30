@@ -35,5 +35,8 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     resource '/api/v3/admin/*', headers: :any,
                                 methods: [:get, :post, :patch, :put, :delete, :options, :head],
                                 credentials: true
+    resource '/api/v3/store/*', headers: :any,
+                                methods: [:get, :post, :patch, :put, :delete, :options, :head],
+                                credentials: true
   end
 end
