@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Devise.setup do |config|
-  config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
+  config.mailer_sender = ENV.fetch('SMTP_FROM_ADDRESS', 'noreply@minimeshop.net')
 
   require 'devise/orm/active_record'
 
