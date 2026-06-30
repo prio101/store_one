@@ -64,15 +64,18 @@ Rails.application.configure do
 
   # SMTP configuration via environment variables.
   # Works with any SMTP provider (Resend, Postmark, Mailgun, SendGrid, SES, etc.)
+  # Port 465 uses implicit TLS (ssl: true); port 587 uses STARTTLS.
   if ENV["SMTP_HOST"].present?
+    smtp_port = ENV.fetch("SMTP_PORT", 465).to_i
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address:              ENV["SMTP_HOST"],
-      port:                 ENV.fetch("SMTP_PORT", 587).to_i,
+      port:                 smtp_port,
       user_name:            ENV["SMTP_USERNAME"],
       password:             ENV["SMTP_PASSWORD"],
       authentication:       :plain,
-      enable_starttls_auto: true
+      ssl:                  smtp_port == 465,
+      enable_starttls_auto: smtp_port != 465
     }
   end
 
