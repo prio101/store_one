@@ -43,6 +43,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "minimeshop.net",
+        pathname: "/rails/active_storage/**",
+      },
+      {
+        protocol: "https",
         hostname: "**.vendo.dev",
         pathname: "/rails/active_storage/**",
       },
