@@ -289,6 +289,8 @@ GEM
       activesupport (>= 6.1)
     groupdate (6.8.0)
       activesupport (>= 7.2)
+    heroicon (1.0.0)
+      rails (>= 5.2)
     highline (3.1.2)
       reline
     hightop (0.6.0)
@@ -390,6 +392,9 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mail_form (1.11.0)
+      actionpack (>= 7.0)
+      activemodel (>= 7.0)
     mapkick-rb (0.3.0)
     marcel (1.2.1)
     matrix (0.4.3)
@@ -721,6 +726,11 @@ GEM
       oj (~> 3.16)
       spree_core (= 5.5.0)
       typelizer (~> 0.11.0)
+    spree_cod_payment (2.1.6)
+      spree (>= 5.2.0)
+      spree_admin (>= 5.2.0)
+      spree_extension
+      spree_storefront (>= 5.2.0)
     spree_core (5.5.0)
       active_storage_validations (>= 1.3, < 4)
       acts-as-taggable-on
@@ -795,10 +805,30 @@ GEM
       rails-i18n
       spree_core (>= 4.2.0.rc3)
       spree_extension
+    spree_page_builder (5.4.5)
+      spree (>= 5.4.0)
+      spree_admin (>= 5.4.0)
+      spree_posts
     spree_paypal_checkout (0.7.1)
       paypal-server-sdk (~> 1.1)
       spree (>= 5.4.0)
       spree_admin (>= 5.4.0)
+    spree_posts (1.0.0)
+      spree (>= 5.4.0.beta)
+      spree_admin (>= 5.4.0.beta)
+    spree_storefront (5.4.5)
+      active_link_to
+      heroicon
+      importmap-rails
+      inline_svg (~> 1.10)
+      local_time (~> 3.0)
+      mail_form
+      pagy (~> 43.0)
+      spree_page_builder (>= 5.4.5)
+      stimulus-rails
+      tailwindcss-rails
+      tailwindcss-ruby
+      turbo-rails
     spree_stripe (1.7.1)
       spree (>= 5.4.0.beta)
       spree_admin (>= 5.4.0.beta)
@@ -935,6 +965,7 @@ DEPENDENCIES
   spree (>= 5.5.0.rc3)
   spree_admin (>= 5.5.0.rc3)
   spree_adyen
+  spree_cod_payment (~> 2.1)
   spree_dev_tools
   spree_i18n
   spree_paypal_checkout
@@ -1051,6 +1082,7 @@ CHECKSUMS
   github_changelog_generator (1.18.0) sha256=f6ad4c53a14e8d1e440492f5a7b3d0a4c76e072add568e78b437510b2f02d000
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
   groupdate (6.8.0) sha256=16f90ea18ca981c38e41e592416480b28353aa5e5cc3e7cb13a68b8fb5d40510
+  heroicon (1.0.0) sha256=e63a535a630d6fd3d99c0179d722753c8cd3478df1277eca7a4215c135b6e9cb
   highline (3.1.2) sha256=67cbd34d19f6ef11a7ee1d82ffab5d36dfd5b3be861f450fc1716c7125f4bb4a
   hightop (0.6.0) sha256=d3799d2232e4d0bc69bfd940e49832d66bcf18b7098be252a4fd65f1eb29b778
   httparty (0.24.2) sha256=8fca6a54aa0c4aa4303a0fd33e5e2156175d6a5334f714263b458abd7fda9c38
@@ -1084,6 +1116,7 @@ CHECKSUMS
   lograge (0.14.0) sha256=42371a75823775f166f727639f5ddce73dd149452a55fc94b90c303213dc9ae1
   loofah (2.25.1) sha256=d436c73dbd0c1147b16c4a41db097942d217303e1f7728704b37e4df9f6d2e04
   mail (2.9.0) sha256=6fa6673ecd71c60c2d996260f9ee3dd387d4673b8169b502134659ece6d34941
+  mail_form (1.11.0) sha256=54aaaf11b69e7e5bd4be220dfc80f2469bb809d6ed1f893b8d940f0b67232c5a
   mapkick-rb (0.3.0) sha256=d2b96122081e79f1f1bfd3c2667885a0723248d37e8f4af71df1049cf975e248
   marcel (1.2.1) sha256=1678e9360e32f9eafa917c80029e2f6d10b2715c66a4b87b6d0da9b9cd1f859f
   matrix (0.4.3) sha256=a0d5ab7ddcc1973ff690ab361b67f359acbb16958d1dc072b8b956a286564c5b
@@ -1212,11 +1245,15 @@ CHECKSUMS
   spree_admin (5.5.0) sha256=2e9149cfa99c687a6d7cbedb6193fc5aa4558f32eacef6ebbebe77c9ad0ee1c0
   spree_adyen (0.11.0) sha256=f22941571d4cde4ae12fc7aa13f37d85005b71f2c9c2ff50ec8d1dceabfd564a
   spree_api (5.5.0) sha256=ee3ea3857841412b5d81fb43df71d5a9fd1ffc9773077392dc51ad25cd58d4c4
+  spree_cod_payment (2.1.6) sha256=cf2edd8bc96297b2f923debf5951ac4b512683c5c9a15e771cac6e45a3a3aac7
   spree_core (5.5.0) sha256=0659e197da8620076e29718bb9460b1c01735a27dc707ede9b11460ba9e91c08
   spree_dev_tools (0.6.1) sha256=4d86ab6643cbc7a2b813faa70cd397028380ee8cd2be923f6eb5db8cc126ea14
   spree_extension (1.0.2) sha256=71725dafe45319a2be1bd2b564a416afe8029af8e18ac703bdb835e09553e1df
   spree_i18n (5.3.2) sha256=03b805235ca156644951f6bc3d07cbe43d0aa01134c4a27e3f3304011956f79b
+  spree_page_builder (5.4.5) sha256=09a6b08cf2fe80a4c6eac40422d86dcd27fce7f2f9ee8ad75464abcd0820bc89
   spree_paypal_checkout (0.7.1) sha256=89a5715a3b23b2ac04a27ddfd12416101fab03996cf70826d35dedef3bb4b9de
+  spree_posts (1.0.0) sha256=3f9dbf4af97186cca99e81f1a1ffb13c745d5f8cb6e43a1884eb3acf93063d4b
+  spree_storefront (5.4.5) sha256=3cdd9686d208344ac04c58a0d6e1924cb30a0c83ed97664952b71bbddd784cca
   spree_stripe (1.7.1) sha256=55d5846709fc43a0442068577fb0dc43bd25d14abf66352a37272e2ac4f95ce5
   sqids (0.2.2) sha256=c2d31e0dfb6c32d17c10b59df059a299af93bef716d700ff70d77156df702d36
   sshkit (1.25.0) sha256=c8c6543cdb60f91f1d277306d585dd11b6a064cb44eab0972827e4311ff96744

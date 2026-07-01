@@ -81,3 +81,5 @@ group :development do
   gem 'kamal', require: false
   gem 'web-console'
 end
+
+gem "spree_cod_payment", "~> 2.1"
