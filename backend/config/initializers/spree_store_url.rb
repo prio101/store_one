@@ -9,7 +9,7 @@
 # origin exists on every boot.
 
 Rails.application.config.after_initialize do
-  frontend_url = ENV.fetch('FRONTEND_URL', 'http://localhost:3000')
+  frontend_url = "https://minimeshop.net"
 
   Spree::Store.find_each do |store|
     # Ensure the correct allowed origin exists
@@ -21,4 +21,7 @@ Rails.application.config.after_initialize do
       store.allowed_origins.where(origin: 'http://localhost').destroy_all
     end
   end
+rescue ActiveRecord::ConnectionNotEstablished, ActiveRecord::NoDatabaseError,
+       PG::ConnectionBad, ActiveRecord::StatementInvalid
+  # Skip during asset precompilation or when the database is unavailable
 end
