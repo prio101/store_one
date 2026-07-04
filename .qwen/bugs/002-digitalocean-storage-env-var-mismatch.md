@@ -1,6 +1,6 @@
 # BUG-002: DigitalOcean Spaces storage not configured — env var names mismatch
 
-**Status:** Open
+**Status:** Fixed
 **Severity:** High — Active Storage cannot reach DigitalOcean Spaces in production
 **Reported:** 2026-07-01
 **URL:** https://minimeshop.net
@@ -116,5 +116,43 @@ The server has `minimeshop` but local has `minimeshop-bucket`. Need to confirm w
 
 - BUG-001: Product images not loading (Next.js remotePatterns — fixed)
 - `backend/config/storage.yml`
+- `backend/config/environments/production.rb`
 - `/opt/store_one/.env` (server)
 - `docker-compose.prod.yml`
+
+---
+
+## Fix Applied (2026-07-01)
+
+### Changes
+
+1. **`backend/config/storage.yml`** — Changed env var names from `AWS_*` to `DO_SPACES_*`:
+   ```yaml
+   amazon:
+     service: S3
+     endpoint: "https://<%= ENV.fetch('DO_SPACES_REGION', 'sgp1') %>.digitaloceanspaces.com"
+     access_key_id: <%= ENV.fetch("DO_SPACES_KEY", "") %>
+     secret_access_key: <%= ENV.fetch("DO_SPACES_SECRET", "") %>
+     region: <%= ENV.fetch("DO_SPACES_REGION", "sgp1") %>
+     bucket: <%= ENV.fetch("DO_SPACES_BUCKET", "minimeshop-bucket") %>
+     public: true
+   ```
+
+2. **`backend/config/environments/production.rb`** — Added `DO_SPACES_*` check before `AWS_*` fallback:
+   ```ruby
+   if ENV["DO_SPACES_KEY"].present? && ENV["DO_SPACES_SECRET"].present?
+     config.active_storage.service = :amazon
+   elsif ENV["AWS_ACCESS_KEY_ID"].present? && ENV["AWS_SECRET_ACCESS_KEY"].present?
+     config.active_storage.service = :amazon
+   # ...
+   ```
+
+3. **Server `.env`** (`/opt/store_one/.env`) — Fixed bucket name: `minimeshop` → `minimeshop-bucket`
+
+### Verification
+
+```ruby
+# Rails console on production:
+ActiveStorage::Blob.service.class  #=> ActiveStorage::Service::S3Service
+ActiveStorage::Blob.service.bucket.name  #=> "minimeshop-bucket"
+```

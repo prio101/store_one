@@ -49,7 +49,11 @@ Next.js `<Image>` silently blocks the load, the `ProductImage` component catches
 
 ## Fix
 
-### 1. Add DigitalOcean Spaces to `next.config.ts` `remotePatterns`
+### 1. Add DigitalOcean Spaces AND minimeshop.net to `next.config.ts` `remotePatterns`
+
+Two patterns are needed:
+- `**.digitaloceanspaces.com` — for direct DO Spaces URLs
+- `minimeshop.net` — for Active Storage proxied URLs (the API returns `https://minimeshop.net/rails/active_storage/blobs/proxy/...`)
 
 ```ts
 // apps/storefront/next.config.ts
@@ -58,12 +62,19 @@ images: {
     // ... existing patterns ...
     {
       protocol: "https",
+      hostname: "minimeshop.net",
+      pathname: "/rails/active_storage/**",
+    },
+    {
+      protocol: "https",
       hostname: "**.digitaloceanspaces.com",
       pathname: "/**",
     },
   ],
 },
 ```
+
+**Note:** The Active Storage URLs use the proxied format (`minimeshop.net/rails/active_storage/blobs/proxy/...`), NOT direct DO Spaces URLs. Without `minimeshop.net` in the list, Next.js Image Optimization rejects the URLs with `"url" parameter is not allowed` (HTTP 400).
 
 ### 2. (Recommended) Also add `endpoint` to `backend/config/storage.yml`
 

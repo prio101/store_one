@@ -1,6 +1,6 @@
 # BUG-003: CodPayment missing `authorize` method — checkout crashes
 
-**Status:** Open
+**Status:** Fixed
 **Severity:** High — users cannot complete checkout with COD payment
 **Reported:** 2026-07-01
 **Sentry:** NoMethodError: undefined method 'authorize' for Spree::PaymentMethod::CodPayment
