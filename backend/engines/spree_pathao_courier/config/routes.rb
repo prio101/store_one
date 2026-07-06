@@ -11,6 +11,15 @@ Spree::Core::Engine.add_routes do
         post :ship_with_pathao, on: :member,
              controller: '/spree/pathao_courier/admin/shipments'
       end
+
+      # Courier tracking endpoints
+      scope 'courier',
+            controller: '/spree/pathao_courier/admin/courier',
+            as: 'courier' do
+        post 'estimate_cost'
+        post 'confirm'
+        get  'tracking'
+      end
     end
   end
 end

@@ -1,0 +1,260 @@
+<%# frozen_string_literal: true %>
+<%# Courier Delivery Tracking Section for Order Edit Page %>
+<%# locals: { order:, config: } %>
+
+<% config ||= Spree::PathaoCourierConfig.find_by(store: order.store) %>
+<% tracking_info = Spree::CourierDeliveryTrackingInformation.where(order: order).order(created_at: :desc).first %>
+
+<div class="card mb-4" id="courier-tracking-section">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0 d-flex align-items-center gap-2">
+      <i class="bi bi-truck"></i> Courier Delivery
+    </h5>
+    <% if tracking_info&.confirmed? %>
+      <span class="badge bg-success text-white">Confirmed</span>
+    <% elsif tracking_info %>
+      <span class="badge bg-warning text-white">Pending</span>
+    <% end %>
+  </div>
+  <div class="card-body">
+    <% if config %>
+      <%# Courier Selection %>
+      <fieldset class="mb-4">
+        <legend class="form-label font-bold">Courier Service</legend>
+        <div class="d-flex gap-4">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="courier_type" id="courier_pathao" value="pathao"
+                   <%= tracking_info&.courier_name != 'other' ? 'checked' : '' %>>
+            <label class="form-check-label" for="courier_pathao">Courier Via Pathao</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="courier_type" id="courier_other" value="other"
+                   <%= tracking_info&.courier_name == 'other' ? 'checked' : '' %>>
+            <label class="form-check-label" for="courier_other">Other Courier</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <%# Pathao Options (shown when Pathao is selected) %>
+      <div id="pathao-options">
+        <%# Delivery Type %>
+        <fieldset class="mb-4">
+          <legend class="form-label font-bold">Delivery Option</legend>
+          <div class="d-flex gap-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_normal" value="48"
+                     <%= (tracking_info&.delivery_type || config.default_delivery_type) == 48 ? 'checked' : '' %>>
+              <label class="form-check-label" for="delivery_normal">Normal (3-5 days)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="delivery_type" id="delivery_express" value="12"
+                     <%= tracking_info&.delivery_type == 12 ? 'checked' : '' %>>
+              <label class="form-check-label" for="delivery_express">Express (1-2 days)</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <%# Item Weight %>
+        <div class="form-group mb-4">
+          <label class="form-label font-bold" for="item_weight">Item Weight (grams)</label>
+          <input type="number" class="form-control" id="item_weight" value="<%= tracking_info&.item_weight || config.default_weight %>" min="1">
+        </div>
+
+        <%# Calculate Button %>
+        <div class="form-group mb-4 text-center">
+          <button type="button" class="btn btn-primary" id="calculate-cost-btn">
+            <i class="bi bi-calculator"></i> Calculate Total COD
+          </button>
+        </div>
+
+        <%# Cost Breakdown (hidden by default) %>
+        <div id="cost-breakdown" class="border rounded p-4 mb-4" style="display: none;">
+          <h6 class="font-bold mb-3 text-center">Cost Breakdown</h6>
+          <div class="flex row">
+            <div class="col-6 text-end">
+              <p class="mb-2">Shipping Cost:</p>
+              <p class="mb-2">COD Fee:</p>
+              <p class="mb-2 font-bold">Total to Collect:</p>
+              <p class="mb-0 text-muted">Expected Delivery:</p>
+            </div>
+            <div class="col-6">
+              <p class="mb-2 ml-2" id="shipping-cost">৳0</p>
+              <p class="mb-2 ml-2" id="cod-fee">৳0</p>
+              <p class="mb-2 ml-2 font-bold" id="total-collect">৳0</p>
+              <p class="mb-0 ml-2 text-muted" id="estimated-delivery">-</p>
+            </div>
+          </div>
+        </div>
+
+        <%# Tracking Number (shown after confirmation) %>
+        <% if tracking_info&.consignment_id.present? %>
+          <div class="form-group mb-4">
+            <label class="form-label font-bold" for="tracking-number">Tracking Number</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="tracking-number"
+                     value="<%= tracking_info.consignment_id %>" readonly>
+              <button class="btn btn-outline-secondary" type="button"
+                      id="copy-tracking-btn" title="Copy to clipboard">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+          </div>
+        <% end %>
+
+        <%# Note %>
+        <div class="form-group mb-4">
+          <label class="form-label font-bold" for="courier-note">Special Instructions</label>
+          <textarea class="form-control" id="courier-note" rows="2"><%= tracking_info&.note %></textarea>
+        </div>
+
+        <%# Confirm Button — <a> tag to avoid form submit conflict with main Spree form %>
+        <div class="form-actions d-flex gap-3 align-items-center justify-content-center">
+          <a href="javascript:void(0)" class="btn btn-primary<%= ' disabled' if tracking_info&.confirmed? %>" id="confirm-btn" role="button"
+             <%= 'disabled' if tracking_info&.confirmed? %>>
+            <i class="bi bi-check-circle"></i> Confirm & Save
+          </a>
+          <% if tracking_info&.confirmed? %>
+            <span class="text-muted">
+              Confirmed at <%= tracking_info.confirmed_at&.strftime('%Y-%m-%d %H:%M') %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="alert alert-warning mb-0">
+        <i class="bi bi-exclamation-triangle"></i>
+        Pathao Courier is not configured for this store.
+        <a href="<%= spree.new_admin_pathao_courier_config_path %>">Configure now</a>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+(function() {
+  var SECTION = document.getElementById('courier-tracking-section');
+  if (!SECTION) return;
+
+  var ORDER_ID = '<%= order.number %>';
+  var CSRF_TOKEN = '<%= form_authenticity_token %>';
+
+  function showLoading(btn, text) {
+    btn.setAttribute('disabled', 'disabled');
+    btn.classList.add('disabled');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> ' + text;
+  }
+
+  function hideLoading(btn, html) {
+    btn.removeAttribute('disabled');
+    btn.classList.remove('disabled');
+    btn.innerHTML = html;
+  }
+
+  function bindCopyButton() {
+    var copyBtn = document.getElementById('copy-tracking-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function() {
+        var tn = document.getElementById('tracking-number');
+        if (tn && tn.value) {
+          navigator.clipboard.writeText(tn.value).then(function() {
+            alert('Tracking number copied!');
+          }).catch(function() {
+            tn.select();
+            alert('Press Ctrl+C to copy');
+          });
+        }
+      });
+    }
+  }
+
+  // --- Courier radio toggle ---
+  SECTION.querySelectorAll('input[name="courier_type"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.getElementById('pathao-options').style.display =
+        radio.value === 'pathao' ? 'block' : 'none';
+    });
+  });
+
+  // --- Calculate cost button ---
+  var calcBtn = document.getElementById('calculate-cost-btn');
+  if (calcBtn) {
+    calcBtn.addEventListener('click', function() {
+      var deliveryType = (document.querySelector('input[name="delivery_type"]:checked') || {}).value || '48';
+      var itemWeight = (document.getElementById('item_weight') || {}).value || '500';
+
+      showLoading(calcBtn, 'Calculating...');
+
+      fetch('/admin/courier/orders/' + ORDER_ID + '/estimate_cost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': CSRF_TOKEN
+        },
+        body: JSON.stringify({ delivery_type: parseInt(deliveryType), item_weight: parseInt(itemWeight) })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          var c = data.cost;
+          document.getElementById('cost-breakdown').style.display = 'block';
+          document.getElementById('shipping-cost').textContent = '\u09F3' + c.price;
+          document.getElementById('cod-fee').textContent = '\u09F3' + Math.round(c.price * c.cod_percentage / 100);
+          document.getElementById('total-collect').textContent = '\u09F3' + c.final_price;
+          document.getElementById('estimated-delivery').textContent = c.estimated_delivery;
+        } else {
+          alert(data.error || 'Failed to calculate cost');
+        }
+      })
+      .catch(function() { alert('Network error. Please try again.'); })
+      .finally(function() {
+        hideLoading(calcBtn, '<i class="bi bi-calculator"></i> Calculate Total COD');
+      });
+    });
+  }
+
+  // --- Confirm button ---
+  var confirmBtn = document.getElementById('confirm-btn');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (confirmBtn.hasAttribute('disabled')) return;
+
+      var deliveryType = (document.querySelector('input[name="delivery_type"]:checked') || {}).value || '48';
+      var itemWeight = (document.getElementById('item_weight') || {}).value || '500';
+      var note = (document.getElementById('courier-note') || {}).value || '';
+
+      showLoading(confirmBtn, 'Confirming...');
+
+      fetch('/admin/courier/orders/' + ORDER_ID + '/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': CSRF_TOKEN
+        },
+        body: JSON.stringify({ delivery_type: parseInt(deliveryType), item_weight: parseInt(itemWeight), note: note })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          alert('Shipment confirmed! Tracking: ' + data.tracking_info.consignment_id);
+          confirmBtn.setAttribute('disabled', 'disabled');
+          confirmBtn.classList.add('disabled');
+          confirmBtn.innerHTML = '<i class="bi bi-check-circle"></i> Confirmed';
+          window.location.reload();
+        } else {
+          alert(data.error || 'Failed to confirm shipment');
+          hideLoading(confirmBtn, '<i class="bi bi-check-circle"></i> Confirm & Save');
+        }
+      })
+      .catch(function() {
+        alert('Network error. Please try again.');
+        hideLoading(confirmBtn, '<i class="bi bi-check-circle"></i> Confirm & Save');
+      });
+    });
+  }
+
+  bindCopyButton();
+})();
+</script>

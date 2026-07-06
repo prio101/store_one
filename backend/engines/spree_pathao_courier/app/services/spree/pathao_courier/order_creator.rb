@@ -3,15 +3,17 @@
 module Spree
   module PathaoCourier
     class OrderCreator
-      MERCHANT_API_PATH = '/aladdin/api/v1/merchant/orders'
+      ORDER_API_PATH = '/aladdin/api/v1/orders'
 
       # @param shipment [Spree::Shipment]
       # @param config [Spree::PathaoCourierConfig]
-      def initialize(shipment:, config:)
+      # @param address_data [Hash, nil] Pre-resolved address data from AddressResolver
+      def initialize(shipment:, config:, address_data: nil)
         @shipment = shipment
         @order = shipment.order
         @config = config
         @client = Spree::PathaoCourier::Client.new(config)
+        @address_data = address_data
       end
 
       # Creates a Pathao shipment and returns the consignment_id.
@@ -20,28 +22,33 @@ module Spree
       # @return [String] consignment_id
       # @raise [Spree::PathaoCourier::ApiError] on API failure
       def call
-        payload = build_payload
-        response = @client.post(MERCHANT_API_PATH, payload)
+        store_id = ensure_store_id
+        payload = build_payload(store_id)
+        Rails.logger.info("[PathaoCourier::OrderCreator] POST #{ORDER_API_PATH} — payload: #{payload.inspect}")
 
-        consignment_id = response.dig('data', 'consignment_id')
+        response = @client.post(ORDER_API_PATH, payload)
+
+        # Pathao returns double-nested: { "data": { "data": { "consignment_id": ... } } }
+        data = unwrap_data(response['data'], response)
+        consignment_id = data['consignment_id']
 
         if consignment_id.blank?
           raise Spree::PathaoCourier::ShippingError,
                 "Pathao did not return a consignment_id: #{response.to_json}"
         end
 
-        @shipment.update!(tracking: consignment_id.to_s)
-
+        @shipment.update_columns(tracking: consignment_id.to_s)
+        Rails.logger.warn("[PathaoCourier::OrderCreator] Shipment #{@shipment.number} tracking updated with consignment_id: #{consignment_id}")
         consignment_id.to_s
       end
 
       private
 
-      def build_payload
+      def build_payload(store_id)
         recipient = @order.shipping_address
 
         {
-          store_id: @config.pathao_store_id,
+          store_id: store_id,
           merchant_order_id: @order.number,
           recipient_name: recipient.full_name,
           recipient_phone: recipient.phone,
@@ -52,50 +59,88 @@ module Spree
           delivery_type: @config.default_delivery_type,
           item_type: @config.default_item_type,
           item_quantity: item_quantity,
-          item_weight: calculate_weight,
+          item_weight: calculate_weight_kg,
           item_description: item_description,
-          shipping_cost: calculate_shipping_cost,
-          collect_cash: order_total_to_collect,
-          note: order_note
+          amount_to_collect: order_total_to_collect,
+          special_instruction: order_note
         }
       end
 
+      # Ensure we have a valid pathao_store_id — fetch from API if missing
+      def ensure_store_id
+        store_id = @config.pathao_store_id
+        return store_id if store_id.present? && store_id.to_i > 0
+
+        Rails.logger.info("[PathaoCourier::OrderCreator] pathao_store_id is nil — attempting to fetch from API")
+        fetched = @client.fetch_store_info
+
+        if fetched.present? && fetched.to_i > 0
+          @config.update_column(:pathao_store_id, fetched)
+          Rails.logger.info("[PathaoCourier::OrderCreator] fetched and saved pathao_store_id: #{fetched}")
+          return fetched
+        end
+
+        raise Spree::PathaoCourier::ApiError,
+              "Pathao store ID could not be determined. Please set it in Courier Config, " \
+              "or verify your Pathao credentials are correct."
+      end
+
+      # Pathao API returns double-nested responses like { "data": { "data": {...} } }
+      def unwrap_data(data, fallback)
+        return fallback if data.nil?
+        return data if data.is_a?(Hash) && data.key?('consignment_id')
+        return data['data'] || fallback if data.is_a?(Hash) && data.key?('data')
+        data
+      end
+
       def lookup_city_id
-        # Pathao uses numeric city IDs; for Dhaka it's typically 1.
-        # In production, this should query /aladdin/api/v1/city-list and cache.
-        1
+        resolved_address[:city_id] || 1
       end
 
       def lookup_zone_id
-        # Zone lookup should query /aladdin/api/v1/zone-list?city_id=X
-        # For now, use a default that works in sandbox (Dhaka zone).
-        # TODO: Implement city/zone/area lookup with caching
-        1
+        resolved_address[:zone_id] || 1
       end
 
       def lookup_area_id
-        # Area lookup should query /aladdin/api/v1/area-list?zone_id=X
-        # For now, use a default that works in sandbox.
-        # TODO: Implement city/zone/area lookup with caching
-        1
+        resolved_address[:area_id] || 1
+      end
+
+      def resolved_address
+        @resolved_address ||= if @address_data
+                                 @address_data
+                               else
+                                 resolve_address_from_order
+                               end
+      end
+
+      def resolve_address_from_order
+        recipient = @order.shipping_address
+        return {} unless recipient
+
+        resolver = Spree::PathaoCourier::AddressResolver.new(
+          config: @config,
+          shipping_address: recipient
+        )
+        resolver.call
+      rescue Spree::PathaoCourier::AddressNotFoundError => e
+        Rails.logger.warn("[PathaoCourier] Address resolution failed: #{e.message}, using defaults")
+        {}
       end
 
       def item_quantity
         @shipment.inventory_units.size
       end
 
-      def calculate_weight
-        # Use default_weight from config (in grams) if available
-        @config.default_weight || 500
+      # Pathao API expects weight in kg (0.5–10 range). Config stores grams.
+      def calculate_weight_kg
+        grams = (@config.default_weight || 500).to_f
+        weight_kg = (grams / 1000).round(2)
+        [weight_kg, 0.5].max
       end
 
       def item_description
         items = @shipment.inventory_units.map { |iu| iu.variant.name }.uniq
         items.join(', ').truncate(255)
-      end
-
-      def calculate_shipping_cost
-        @shipment.cost.to_f
       end
 
       def order_total_to_collect
