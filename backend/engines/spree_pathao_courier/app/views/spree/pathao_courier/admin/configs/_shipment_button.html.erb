@@ -1,0 +1,10 @@
+<%# frozen_string_literal: true %>
+
+<%# Render this partial in shipment edit page to add Pathao ship button %>
+<% config = Spree::PathaoCourierConfig.find_by(store: order.store) %>
+<% if config %>
+  <%= form_tag ship_with_pathao_admin_order_shipment_path(order, shipment), method: :post, class: 'd-inline' do %>
+    <%= submit_tag 'Ship with Pathao', class: 'btn btn-outline-success btn-sm',
+        data: { turbo_confirm: 'Create shipment via Pathao Courier?' } %>
+  <% end %>
+<% end %>

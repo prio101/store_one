@@ -1,0 +1,12 @@
+<%# frozen_string_literal: true %>
+
+<%= render partial: 'spree/admin/shared/error_messages', locals: { target: @config } %>
+
+<div class="card mt-4">
+  <div class="card-header">
+    <h5 class="mb-0">New Pathao Courier Configuration</h5>
+  </div>
+  <div class="card-body mt-4">
+    <%= render 'form' %>
+  </div>
+</div>

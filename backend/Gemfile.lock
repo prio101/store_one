@@ -1,3 +1,19 @@
+PATH
+  remote: engines/spree_courier_manager
+  specs:
+    spree_courier_manager (0.1.0)
+      spree_admin (>= 5.5.0)
+      spree_api (>= 5.5.0)
+      spree_core (>= 5.5.0)
+
+PATH
+  remote: engines/spree_pathao_courier
+  specs:
+    spree_pathao_courier (0.1.0)
+      faraday (~> 2.0)
+      spree_api (>= 5.5.0)
+      spree_core (>= 5.5.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -201,6 +217,9 @@ GEM
       json
     countries (8.1.0)
       unaccent (~> 0.3)
+    crack (1.0.1)
+      bigdecimal
+      rexml
     crass (1.0.6)
     csv (3.3.5)
     database_cleaner (2.1.0)
@@ -289,6 +308,7 @@ GEM
       activesupport (>= 6.1)
     groupdate (6.8.0)
       activesupport (>= 7.2)
+    hashdiff (1.2.1)
     heroicon (1.0.0)
       rails (>= 5.2)
     highline (3.1.2)
@@ -912,6 +932,10 @@ GEM
       nokogiri (~> 1.6)
       rubyzip (>= 1.3.0)
       selenium-webdriver (~> 4.0, < 4.11)
+    webmock (3.26.2)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket (1.2.11)
     websocket-driver (0.8.1)
       base64
@@ -966,8 +990,10 @@ DEPENDENCIES
   spree_admin (>= 5.5.0.rc3)
   spree_adyen
   spree_cod_payment (~> 2.1)
+  spree_courier_manager!
   spree_dev_tools
   spree_i18n
+  spree_pathao_courier!
   spree_paypal_checkout
   spree_stripe
   stimulus-rails
@@ -976,6 +1002,7 @@ DEPENDENCIES
   turbo-rails
   tzinfo-data
   web-console
+  webmock (~> 3.23)
 
 CHECKSUMS
   action_text-trix (2.1.19) sha256=7012f59421009cf284aa651294896414d653a61a2417c9b8714c8476d2f74009
@@ -1037,6 +1064,7 @@ CHECKSUMS
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
   console (1.36.0) sha256=45599ea906cf80a73d8941f03abf873fe66a6a954e0bac5bc1c01e2cdc406f07
   countries (8.1.0) sha256=4d6b318b8e906f1f769d5c021c13a418d33e917dc96ceb625a91d8e7ab2d192e
+  crack (1.0.1) sha256=ff4a10390cd31d66440b7524eb1841874db86201d5b70032028553130b6d4c7e
   crass (1.0.6) sha256=dc516022a56e7b3b156099abc81b6d2b08ea1ed12676ac7a5657617f012bd45d
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   database_cleaner (2.1.0) sha256=1dcba26e3b1576da692fc6bac10136a4744da5bcc293d248aae19640c65d89cd
@@ -1082,6 +1110,7 @@ CHECKSUMS
   github_changelog_generator (1.18.0) sha256=f6ad4c53a14e8d1e440492f5a7b3d0a4c76e072add568e78b437510b2f02d000
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
   groupdate (6.8.0) sha256=16f90ea18ca981c38e41e592416480b28353aa5e5cc3e7cb13a68b8fb5d40510
+  hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
   heroicon (1.0.0) sha256=e63a535a630d6fd3d99c0179d722753c8cd3478df1277eca7a4215c135b6e9cb
   highline (3.1.2) sha256=67cbd34d19f6ef11a7ee1d82ffab5d36dfd5b3be861f450fc1716c7125f4bb4a
   hightop (0.6.0) sha256=d3799d2232e4d0bc69bfd940e49832d66bcf18b7098be252a4fd65f1eb29b778
@@ -1247,10 +1276,12 @@ CHECKSUMS
   spree_api (5.5.0) sha256=ee3ea3857841412b5d81fb43df71d5a9fd1ffc9773077392dc51ad25cd58d4c4
   spree_cod_payment (2.1.6) sha256=cf2edd8bc96297b2f923debf5951ac4b512683c5c9a15e771cac6e45a3a3aac7
   spree_core (5.5.0) sha256=0659e197da8620076e29718bb9460b1c01735a27dc707ede9b11460ba9e91c08
+  spree_courier_manager (0.1.0)
   spree_dev_tools (0.6.1) sha256=4d86ab6643cbc7a2b813faa70cd397028380ee8cd2be923f6eb5db8cc126ea14
   spree_extension (1.0.2) sha256=71725dafe45319a2be1bd2b564a416afe8029af8e18ac703bdb835e09553e1df
   spree_i18n (5.3.2) sha256=03b805235ca156644951f6bc3d07cbe43d0aa01134c4a27e3f3304011956f79b
   spree_page_builder (5.4.5) sha256=09a6b08cf2fe80a4c6eac40422d86dcd27fce7f2f9ee8ad75464abcd0820bc89
+  spree_pathao_courier (0.1.0)
   spree_paypal_checkout (0.7.1) sha256=89a5715a3b23b2ac04a27ddfd12416101fab03996cf70826d35dedef3bb4b9de
   spree_posts (1.0.0) sha256=3f9dbf4af97186cca99e81f1a1ffb13c745d5f8cb6e43a1884eb3acf93063d4b
   spree_storefront (5.4.5) sha256=3cdd9686d208344ac04c58a0d6e1924cb30a0c83ed97664952b71bbddd784cca
@@ -1300,6 +1331,7 @@ CHECKSUMS
   warden (1.2.9) sha256=46684f885d35a69dbb883deabf85a222c8e427a957804719e143005df7a1efd0
   web-console (4.3.0) sha256=e13b71301cdfc2093f155b5aa3a622db80b4672d1f2f713119cc7ec7ac6a6da4
   webdrivers (5.3.1) sha256=d7d5531fbc3c44b6a2a7710e3e6c5edc54f35c68af20017309e3eccf15ec4aa5
+  webmock (3.26.2) sha256=774556f2ea6371846cca68c01769b2eac0d134492d21f6d0ab5dd643965a4c90
   websocket (1.2.11) sha256=b7e7a74e2410b5e85c25858b26b3322f29161e300935f70a0e0d3c35e0462737
   websocket-driver (0.8.1) sha256=5ab238238ce230e5d4b262d2be39624c867914eab99171dc4952b58b577c2d96
   websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241

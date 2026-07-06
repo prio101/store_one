@@ -1,0 +1,68 @@
+<% content_for :page_title do %>
+  Couriers
+<% end %>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+  <% @integrations.each do |integration| %>
+    <div class="relative border rounded-lg p-6 transition-all <%= integration.enabled? && integration.available? ? 'border-green-500 bg-green-50 shadow-sm' : 'border-gray-200 bg-white' %>">
+      <% unless integration.available? %>
+        <div class="mt-1">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+            <i class="ti ti-alert-circle w-3 h-3 mr-1"></i>
+            Feature Not Available Yet
+          </span>
+        </div>
+      <% end %>
+      <div class="flex flex-col h-auto">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center space-x-3 mx-1">
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center <%= integration.enabled? ? 'bg-green-100' : 'bg-gray-100' %>">
+              <% if integration.logo.present? %>
+                <%= image_tag integration.logo, class: "w-8 h-8 object-contain #{'opacity-40' unless integration.available?}", alt: integration.name %>
+              <% else %>
+                <i class="ti ti-<%= integration.icon.presence || 'truck' %> w-6 h-6 <%= integration.enabled? ? 'text-green-600' : 'text-gray-500' %>"></i>
+              <% end %>
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900 px-2"><%= integration.name %></h3>
+              <p class="text-sm text-gray-500 px-2"><%= integration.description %></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+          <% if integration.enabled? %>
+            <span class="inline-flex items-center p-3 rounded-full text-xs font-medium bg-green-500 text-white">
+              Enabled
+            </span>
+          <% else %>
+            <span class="inline-flex items-center p-3 rounded-full text-xs font-medium bg-gray-900 text-white">
+              Disabled
+            </span>
+          <% end %>
+
+          <div class="flex items-center space-x-2">
+            <% if integration.enabled? && integration.available? && integration.config_url.present? %>
+              <%= link_to integration.config_url, class: 'underline inline-flex items-center p-3 text-sm font-medium rounded-md text-blue-400 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' do %>
+                Configure
+              <% end %>
+            <% end %>
+            <% if integration.available? %>
+              <%= form_tag toggle_admin_courier_integration_path(integration), method: :post, class: 'inline' do %>
+                <button type="submit"
+                  class="cursor-pointer inline-flex items-center p-3 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 <%= integration.enabled? ? 'border-red-300 text-red-700 bg-white hover:bg-red-50 focus:ring-red-500' : 'border-green-300 text-green-700 bg-white hover:bg-green-50 focus:ring-green-500' %>">
+                  <%= integration.enabled? ? 'Disable' : 'Enable' %>
+                </button>
+              <% end %>
+            <% else %>
+              <button type="button" disabled
+                class="inline-flex items-center p-3 border text-sm font-medium rounded-md border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed">
+                Enable
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

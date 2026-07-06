@@ -75,6 +75,7 @@ group :development, :test do
   gem 'rubocop-rails-omakase', require: false
   gem 'simplecov-cobertura'
   gem 'spree_dev_tools'
+  gem 'webmock', '~> 3.23'
 end
 
 group :development do
@@ -83,3 +84,9 @@ group :development do
 end
 
 gem "spree_cod_payment", "~> 2.1"
+
+# Pathao Courier integration
+gem 'spree_pathao_courier', path: 'engines/spree_pathao_courier'
+
+# Courier Manager
+gem 'spree_courier_manager', path: 'engines/spree_courier_manager'
