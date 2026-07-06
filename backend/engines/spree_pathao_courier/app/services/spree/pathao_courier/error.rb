@@ -6,5 +6,6 @@ module Spree
     class AuthenticationError < Error; end
     class ApiError < Error; end
     class ShippingError < Error; end
+    class AddressNotFoundError < Error; end
   end
 end
