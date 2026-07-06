@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_15_142512) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -311,6 +311,57 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_142512) do
     t.index ["order_id"], name: "index_spree_coupon_codes_on_order_id"
     t.index ["promotion_id"], name: "index_spree_coupon_codes_on_promotion_id"
     t.index ["state"], name: "index_spree_coupon_codes_on_state"
+  end
+
+  create_table "spree_courier_delivery_tracking_informations", force: :cascade do |t|
+    t.decimal "cod_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "confirmed_at"
+    t.string "consignment_id"
+    t.string "courier_name", default: "pathao", null: false
+    t.datetime "created_at", null: false
+    t.integer "delivery_type", default: 48, null: false
+    t.string "estimated_delivery"
+    t.text "item_description"
+    t.integer "item_quantity", default: 1, null: false
+    t.integer "item_type", default: 2, null: false
+    t.decimal "item_weight", precision: 10, scale: 2, default: "500.0"
+    t.string "merchant_order_id", null: false
+    t.text "note"
+    t.bigint "order_id", null: false
+    t.string "order_status"
+    t.text "recipient_address", null: false
+    t.integer "recipient_area_id"
+    t.integer "recipient_city_id"
+    t.string "recipient_name", null: false
+    t.string "recipient_phone", null: false
+    t.integer "recipient_zone_id"
+    t.bigint "shipment_id"
+    t.decimal "shipping_cost", precision: 10, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["consignment_id"], name: "idx_courier_tracking_on_consignment_id"
+    t.index ["merchant_order_id"], name: "idx_courier_tracking_on_merchant_order_id"
+    t.index ["order_id"], name: "index_spree_courier_delivery_tracking_informations_on_order_id"
+    t.index ["order_status"], name: "idx_courier_tracking_on_order_status"
+    t.index ["shipment_id"], name: "idx_on_shipment_id_ce1336fe91"
+  end
+
+  create_table "spree_courier_integrations", force: :cascade do |t|
+    t.boolean "available", default: false, null: false
+    t.string "config_url"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.boolean "enabled", default: false, null: false
+    t.string "icon"
+    t.string "logo"
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.jsonb "settings", default: {}
+    t.string "slug", null: false
+    t.bigint "store_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["store_id", "slug"], name: "index_spree_courier_integrations_on_store_id_and_slug", unique: true
+    t.index ["store_id"], name: "index_spree_courier_integrations_on_store_id"
   end
 
   create_table "spree_credit_cards", force: :cascade do |t|
@@ -910,6 +961,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_142512) do
     t.index ["store_id"], name: "index_spree_orders_on_store_id"
     t.index ["token"], name: "index_spree_orders_on_token"
     t.index ["user_id", "created_by_id"], name: "index_spree_orders_on_user_id_and_created_by_id"
+  end
+
+  create_table "spree_pathao_courier_configs", force: :cascade do |t|
+    t.string "access_token"
+    t.boolean "active", default: true, null: false
+    t.string "base_url", default: "https://courier-api-sandbox.pathao.com", null: false
+    t.string "client_id", null: false
+    t.string "client_secret", null: false
+    t.datetime "created_at", null: false
+    t.integer "default_delivery_type", default: 48
+    t.integer "default_item_type", default: 2
+    t.integer "default_weight", default: 500
+    t.string "password", null: false
+    t.integer "pathao_store_id"
+    t.string "refresh_token"
+    t.boolean "sandbox", default: true, null: false
+    t.bigint "store_id", null: false
+    t.datetime "token_expires_at"
+    t.datetime "updated_at", null: false
+    t.string "username", null: false
+    t.index ["store_id"], name: "index_spree_pathao_courier_configs_on_store_id", unique: true
   end
 
   create_table "spree_payment_capture_events", force: :cascade do |t|
@@ -1599,6 +1671,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_142512) do
 
   create_table "spree_shipping_methods", force: :cascade do |t|
     t.string "admin_name"
+    t.boolean "cod", default: false, null: false
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "deleted_at", precision: nil
@@ -2245,8 +2318,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_142512) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "spree_courier_delivery_tracking_informations", "spree_orders", column: "order_id"
+  add_foreign_key "spree_courier_delivery_tracking_informations", "spree_shipments", column: "shipment_id"
+  add_foreign_key "spree_courier_integrations", "spree_stores", column: "store_id"
   add_foreign_key "spree_option_type_translations", "spree_option_types"
   add_foreign_key "spree_option_value_translations", "spree_option_values"
+  add_foreign_key "spree_pathao_courier_configs", "spree_stores", column: "store_id"
   add_foreign_key "spree_payment_sources", "spree_payment_methods", column: "payment_method_id"
   add_foreign_key "spree_payment_sources", "spree_users", column: "user_id"
   add_foreign_key "spree_product_translations", "spree_products"

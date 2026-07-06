@@ -28,6 +28,8 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY .ruby-version Gemfile Gemfile.lock ./
+COPY engines/spree_pathao_courier/ engines/spree_pathao_courier/
+COPY engines/spree_courier_manager/ engines/spree_courier_manager/
 RUN bundle install && \
   rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
   bundle exec bootsnap precompile --gemfile

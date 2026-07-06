@@ -1,0 +1,110 @@
+<%# frozen_string_literal: true %>
+
+<%= form_for @config, url: (@config.persisted? ? admin_pathao_courier_config_path(@config) : admin_pathao_courier_configs_path), method: @config.persisted? ? :patch : :post do |f| %>
+  <% if @config.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(@config.errors.count, 'error') %> prevented saving:</h5>
+      <ul>
+        <% @config.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset class="mb-4">
+    <legend class="form-label font-bold">Status</legend>
+
+    <div class="form-group mb-3">
+      <%= f.label :active, 'Status', class: 'form-label font-bold' %>
+      <%= f.select :active,
+          [['Active', true], ['Inactive', false]],
+          {}, class: 'form-select' %>
+    </div>
+  </fieldset>
+
+  <fieldset class="mb-4">
+    <legend class="form-label font-bold">API Credentials</legend>
+
+    <div class="form-group mb-3">
+      <%= f.label :sandbox, 'Sandbox Mode', class: 'form-label font-bold' %>
+      <div class="form-check">
+        <%= f.check_box :sandbox, class: 'form-check-input' %>
+        <%= f.label :sandbox, 'Enable sandbox (test) mode', class: 'form-check-label' %>
+      </div>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :base_url, 'API Base URL', class: 'form-label font-bold' %>
+      <%= f.text_field :base_url, class: 'form-control', required: true %>
+      <small class="form-text text-muted">
+        Sandbox: https://courier-api-sandbox.pathao.com | Production: https://api-hermes.pathao.com
+      </small>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :client_id, 'Client ID', class: 'form-label font-bold' %>
+      <%= f.text_field :client_id, class: 'form-control', required: true %>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :client_secret, 'Client Secret', class: 'form-label font-bold' %>
+      <%= f.password_field :client_secret, class: 'form-control', required: true,
+          value: @config.client_secret&.present? ? '••••••••' : '' %>
+      <small class="form-text text-muted">
+        <% if @config.persisted? && @config.client_secret.present? %>
+          Leave blank to keep existing value.
+        <% end %>
+      </small>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :username, 'Username (email)', class: 'form-label font-bold' %>
+      <%= f.email_field :username, class: 'form-control', required: true %>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :password, 'Password', class: 'form-label font-bold' %>
+      <%= f.password_field :password, class: 'form-control', required: true,
+          value: @config.password&.present? ? '••••••••' : '' %>
+      <small class="form-text text-muted">
+        <% if @config.persisted? && @config.password.present? %>
+          Leave blank to keep existing value.
+        <% end %>
+      </small>
+    </div>
+  </fieldset>
+
+  <fieldset class="mb-4">
+    <legend>Pathao Store Settings</legend>
+
+    <div class="form-group mb-3">
+      <%= f.label :pathao_store_id, 'Pathao Store ID', class: 'form-label font-bold' %>
+      <%= f.number_field :pathao_store_id, class: 'form-control' %>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :default_delivery_type, 'Default Delivery Type', class: 'form-label font-bold' %>
+      <%= f.select :default_delivery_type,
+          Spree::PathaoCourierConfig::DELIVERY_TYPES.map { |k, v| ["#{v} (#{k})", k] },
+          {}, class: 'form-select' %>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :default_item_type, 'Default Item Type', class: 'form-label font-bold' %>
+      <%= f.select :default_item_type,
+          Spree::PathaoCourierConfig::ITEM_TYPES.map { |k, v| ["#{v} (#{k})", k] },
+          {}, class: 'form-select' %>
+    </div>
+
+    <div class="form-group mb-3">
+      <%= f.label :default_weight, 'Default Weight (grams)', class: 'form-label font-bold' %>
+      <%= f.number_field :default_weight, class: 'form-control', min: 1 %>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <%= f.submit (@config.persisted? ? 'Update Configuration' : 'Save Configuration'),
+        class: 'btn btn-primary' %>
+  </div>
+<% end %>
