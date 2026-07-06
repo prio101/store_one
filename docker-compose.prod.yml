@@ -106,7 +106,7 @@ services:
     restart: unless-stopped
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.48.3
     volumes:
       - meilisearch_data:/meili_data
     environment:
