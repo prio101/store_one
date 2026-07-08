@@ -1,0 +1,55 @@
+<%= form_for prompt, url: (prompt.persisted? ? admin_ai_engine_config_ai_engine_work_task_ai_engine_prompt_path(config, work_task, prompt) : admin_ai_engine_config_ai_engine_work_task_ai_engine_prompts_path(config, work_task)), method: (prompt.persisted? ? :patch : :post) do |f| %>
+  <% if prompt.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(prompt.errors.count, "error") %> prohibited this prompt from being saved:</h5>
+      <ul class="mb-0">
+        <% prompt.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset>
+    <legend class="w-full form-label text-lg font-bold border-b border-gray-300 rounded-lg p-2">Prompt Settings</legend>
+
+    <div class="form-group">
+      <%= f.label :name, "Prompt Name" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "e.g. default_description, short_summary" %>
+      <small class="form-text text-muted">A unique name for this prompt within the work task.</small>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :prompt_template, "Prompt Template" %>
+      <%= f.text_area :prompt_template, class: "form-control font-mono", rows: 12, placeholder: "Write your prompt here. Use {{variable_name}} for dynamic values." %>
+      <small class="form-text text-muted">
+        Use <code>{{product_name}}</code>, <code>{{brand}}</code>, <code>{{category}}</code>, etc. as placeholders.
+        These will be replaced with actual product data when the prompt is used.
+      </small>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend class="w-full form-label text-lg font-bold border-b border-gray-300 rounded-lg p-2">Options</legend>
+
+    <div class="form-group">
+      <div class="form-check">
+        <%= f.check_box :is_default, class: "form-check-input" %>
+        <%= f.label :is_default, "Default Prompt", class: "form-check-label" %>
+      </div>
+      <small class="form-text text-muted">Mark this as the default prompt for this work task. Only one prompt can be default.</small>
+    </div>
+
+    <div class="form-group">
+      <div class="form-check">
+        <%= f.check_box :active, class: "form-check-input" %>
+        <%= f.label :active, "Active", class: "form-check-label" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions mt-4">
+    <%= f.submit prompt.persisted? ? "Update Prompt" : "Create Prompt", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_ai_engine_config_ai_engine_work_task_ai_engine_prompts_path(config, work_task), class: "btn btn-secondary ms-2" %>
+  </div>
+<% end %>

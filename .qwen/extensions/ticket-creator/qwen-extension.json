@@ -1,0 +1,6 @@
+{
+  "name": "ticket-creator",
+  "version": "1.0.0",
+  "displayName": "Ticket Creator",
+  "description": "Auto-detect ticket types (Feature, Request, Bug, Issue, Refactor) from user messages and create structured ticket files in .qwen/ directories."
+}

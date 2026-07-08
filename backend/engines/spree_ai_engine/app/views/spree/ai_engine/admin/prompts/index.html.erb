@@ -1,0 +1,61 @@
+<% content_for :page_actions do %>
+  <%= link_to "New Prompt", new_admin_ai_engine_config_ai_engine_work_task_ai_engine_prompt_path(@config, @work_task), class: "btn btn-primary" %>
+<% end %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">Prompts — <%= @work_task.label %></h1>
+
+  <div class="flex items-center space-x-2 mb-4 mt-4">
+    <%= link_to "New Prompt", new_admin_ai_engine_config_ai_engine_work_task_ai_engine_prompt_path(@config, @work_task), class: "btn btn-primary" %>
+  </div>
+</div>
+
+<% if @prompts.any? %>
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Template Preview</th>
+        <th>Default</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @prompts.each do |prompt| %>
+        <tr>
+          <td><%= prompt.name %></td>
+          <td><code class="text-sm"><%= truncate(prompt.prompt_template, length: 80) %></code></td>
+          <td>
+            <% if prompt.is_default? %>
+              <span class="badge badge-primary">Default</span>
+            <% else %>
+              <span class="badge badge-light">—</span>
+            <% end %>
+          </td>
+          <td>
+            <% if prompt.active? %>
+              <span class="badge badge-success">Active</span>
+            <% else %>
+              <span class="badge badge-light">Inactive</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "Edit", edit_admin_ai_engine_config_ai_engine_work_task_ai_engine_prompt_path(@config, @work_task, prompt), class: "btn btn-sm btn-secondary" %>
+            <%= link_to "Delete", admin_ai_engine_config_ai_engine_work_task_ai_engine_prompt_path(@config, @work_task, prompt),
+                        method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                        class: "btn btn-sm btn-danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="flex mt-2 p-2 items-center justify-center h-auto text-gray-500 text-lg font-semibold border border-dashed border-gray-300 rounded-lg">
+    No prompts configured for this work task. Add one to define how the AI should generate content.
+  </div>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "← Back to Work Tasks", admin_ai_engine_config_ai_engine_work_tasks_path(@config), class: "text-sm text-gray-500 hover:underline" %>
+</div>

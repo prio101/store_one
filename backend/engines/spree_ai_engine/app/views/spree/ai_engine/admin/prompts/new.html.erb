@@ -1,0 +1,9 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">New Prompt</h1>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <%= render "form", prompt: @prompt, config: @config, work_task: @work_task %>
+  </div>
+</div>

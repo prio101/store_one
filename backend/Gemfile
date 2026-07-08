@@ -88,5 +88,8 @@ gem "spree_cod_payment", "~> 2.1"
 # Pathao Courier integration
 gem 'spree_pathao_courier', path: 'engines/spree_pathao_courier'
 
+# AI Engine - AI provider abstraction for product detail generation
+gem 'spree_ai_engine', path: 'engines/spree_ai_engine'
+
 # Courier Manager
 gem 'spree_courier_manager', path: 'engines/spree_courier_manager'

@@ -1,0 +1,68 @@
+<h1>Edit AI Engine Configuration</h1>
+
+<% if @config.persisted? %>
+  <div class="mb-3">
+    <button type="button"
+            class="btn btn-outline-secondary"
+            id="test-connection-btn"
+            data-config-id="<%= @config.id %>"
+            data-url="<%= test_connection_admin_ai_engine_config_path(@config) %>">
+      Test Connection
+    </button>
+    <span id="test-connection-result" class="ms-2"></span>
+  </div>
+<% end %>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <%= render "form", config: @config %>
+  </div>
+</div>
+
+<% if @config.persisted? %>
+  <div class="text-muted mt-3">
+    <%= link_to "Delete Configuration",
+                admin_ai_engine_config_path(@config),
+                method: :delete,
+                data: { turbo_confirm: "Are you sure? This action cannot be undone." },
+                class: "btn btn-outline-danger btn-sm" %>
+  </div>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= link_to "Back to List", admin_ai_engine_configs_path, class: "btn btn-secondary" %>
+<% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("test-connection-btn");
+    if (!btn) return;
+
+    btn.addEventListener("click", function() {
+      const url = this.dataset.url;
+      const resultEl = document.getElementById("test-connection-result");
+
+      btn.disabled = true;
+      resultEl.textContent = "Testing...";
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content,
+          "Content-Type": "application/json"
+        }
+      })
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        resultEl.textContent = data.message;
+        resultEl.className = data.success ? "text-success" : "text-danger";
+        btn.disabled = false;
+      })
+      .catch(function() {
+        resultEl.textContent = "Request failed. Please try again.";
+        resultEl.className = "text-danger";
+        btn.disabled = false;
+      });
+    });
+  });
+</script>

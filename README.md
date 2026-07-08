@@ -47,6 +47,16 @@ This rebuilds the Docker image from `backend/` and restarts services. You can th
 - **Add gems** to `backend/Gemfile`
 - **Add new resources** with `spree generate model <name> <attributes>`
 
+### Asset Precompilation
+
+After ejecting or adding assets (TinyMCE, custom JS/CSS), precompile assets inside the container:
+
+```bash
+docker compose exec web bin/rails assets:precompile
+```
+
+This populates `public/assets/` in the bind-mounted directory, fixing 404 errors for bundled assets like TinyMCE plugins/themes/icons. The dev stage Dockerfile also runs this automatically during image build.
+
 ## Spree CLI
 
 This project uses [`@spree/cli`](https://spreecommerce.org/docs/developer/cli/quickstart) to manage the backend.

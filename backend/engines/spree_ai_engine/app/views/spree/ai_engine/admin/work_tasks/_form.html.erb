@@ -1,0 +1,50 @@
+<%= form_for work_task, url: (work_task.persisted? ? admin_ai_engine_config_ai_engine_work_task_path(config, work_task) : admin_ai_engine_config_ai_engine_work_tasks_path(config)), method: (work_task.persisted? ? :patch : :post) do |f| %>
+  <% if work_task.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(work_task.errors.count, "error") %> prohibited this work task from being saved:</h5>
+      <ul class="mb-0">
+        <% work_task.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset>
+    <legend class="w-full form-label text-lg font-bold border-b border-gray-300 rounded-lg p-2">Work Task Settings</legend>
+
+    <div class="form-group">
+      <%= f.label :name, "Task Type" %>
+      <%= f.select :name, options_for_select(
+        [
+          ["Product Description", "product_description"],
+          ["Product Title", "product_title"],
+          ["SEO Keywords", "seo_keywords"],
+          ["Meta Description", "meta_description"],
+          ["Short Description", "product_short_description"],
+          ["Long Description", "product_long_description"],
+          ["Category Description", "category_description"],
+          ["Brand Story", "brand_story"],
+          ["Custom", "custom"]
+        ], work_task.name
+      ), {}, { class: "form-control" } %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :description, "Description" %>
+      <%= f.text_area :description, class: "form-control", rows: 3, placeholder: "Optional description of what this work task does" %>
+    </div>
+
+    <div class="form-group">
+      <div class="form-check">
+        <%= f.check_box :active, class: "form-check-input" %>
+        <%= f.label :active, "Active", class: "form-check-label" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions mt-4">
+    <%= f.submit work_task.persisted? ? "Update Work Task" : "Create Work Task", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_ai_engine_config_ai_engine_work_tasks_path(config), class: "btn btn-secondary ms-2" %>
+  </div>
+<% end %>

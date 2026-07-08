@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_07_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -192,6 +192,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_100001) do
     t.index ["return_url"], name: "index_spree_adyen_payment_sessions_on_return_url"
     t.index ["status"], name: "index_spree_adyen_payment_sessions_on_status"
     t.index ["user_id"], name: "index_spree_adyen_payment_sessions_on_user_id"
+  end
+
+  create_table "spree_ai_engine_configs", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "ai_model_name", default: "gemini-2.0-flash"
+    t.string "api_key"
+    t.datetime "created_at", null: false
+    t.boolean "logging_enabled", default: true, null: false
+    t.integer "max_output_tokens", default: 2048
+    t.string "provider", default: "gemini", null: false
+    t.integer "rate_limit_rpm"
+    t.bigint "store_id", null: false
+    t.text "system_prompt"
+    t.float "temperature", default: 0.7
+    t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_spree_ai_engine_configs_on_store_id", unique: true
+  end
+
+  create_table "spree_ai_engine_prompts", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "ai_engine_work_task_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "is_default", default: false, null: false
+    t.string "name", null: false
+    t.text "prompt_template", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ai_engine_work_task_id", "name"], name: "idx_on_ai_engine_work_task_id_name_7aa1ecb6c9", unique: true
+    t.index ["ai_engine_work_task_id"], name: "index_spree_ai_engine_prompts_on_ai_engine_work_task_id"
+  end
+
+  create_table "spree_ai_engine_work_tasks", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.bigint "ai_engine_config_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ai_engine_config_id", "name"], name: "idx_on_ai_engine_config_id_name_ce05f6909d", unique: true
+    t.index ["ai_engine_config_id"], name: "index_spree_ai_engine_work_tasks_on_ai_engine_config_id"
   end
 
   create_table "spree_allowed_origins", force: :cascade do |t|
@@ -2318,6 +2357,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_100001) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "spree_ai_engine_configs", "spree_stores", column: "store_id"
+  add_foreign_key "spree_ai_engine_prompts", "spree_ai_engine_work_tasks", column: "ai_engine_work_task_id"
+  add_foreign_key "spree_ai_engine_work_tasks", "spree_ai_engine_configs", column: "ai_engine_config_id"
   add_foreign_key "spree_courier_delivery_tracking_informations", "spree_orders", column: "order_id"
   add_foreign_key "spree_courier_delivery_tracking_informations", "spree_shipments", column: "shipment_id"
   add_foreign_key "spree_courier_integrations", "spree_stores", column: "store_id"

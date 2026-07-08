@@ -1,0 +1,60 @@
+<% content_for :page_actions do %>
+  <%= link_to "New Work Task", new_admin_ai_engine_config_ai_engine_work_task_path(@config), class: "btn btn-primary" %>
+<% end %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">Work Tasks — <%= @config.provider_label %></h1>
+
+  <div class="flex items-center space-x-2 mb-4 mt-4">
+    <%= link_to "New Work Task", new_admin_ai_engine_config_ai_engine_work_task_path(@config), class: "btn btn-primary" %>
+  </div>
+</div>
+
+<% if @work_tasks.any? %>
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Prompts</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @work_tasks.each do |work_task| %>
+        <tr>
+          <td><%= work_task.label %></td>
+          <td><%= truncate(work_task.description, length: 60) || "—" %></td>
+          <td>
+            <%= link_to pluralize(work_task.ai_engine_prompts.count, "prompt"),
+                        admin_ai_engine_config_ai_engine_work_task_ai_engine_prompts_path(@config, work_task),
+                        class: "text-blue-600 hover:underline" %>
+          </td>
+          <td>
+            <% if work_task.active? %>
+              <span class="badge badge-success">Active</span>
+            <% else %>
+              <span class="badge badge-light">Inactive</span>
+            <% end %>
+          </td>
+          <td>
+            <%= link_to "Prompts", admin_ai_engine_config_ai_engine_work_task_ai_engine_prompts_path(@config, work_task), class: "btn btn-sm btn-secondary" %>
+            <%= link_to "Edit", edit_admin_ai_engine_config_ai_engine_work_task_path(@config, work_task), class: "btn btn-sm btn-secondary" %>
+            <%= link_to "Delete", admin_ai_engine_config_ai_engine_work_task_path(@config, work_task),
+                        method: :delete, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" },
+                        class: "btn btn-sm btn-danger" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <div class="flex mt-2 p-2 items-center justify-center h-auto text-gray-500 text-lg font-semibold border border-dashed border-gray-300 rounded-lg">
+    No work tasks configured. Add one to define AI work types for this provider.
+  </div>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to "← Back to Config", edit_admin_ai_engine_config_path(@config), class: "text-sm text-gray-500 hover:underline" %>
+</div>

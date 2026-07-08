@@ -1,0 +1,140 @@
+<%
+  has_ai_config = Spree::AiEngineConfig.active.where(store: Spree::Current.store).exists?
+  generate_url = spree.admin_generate_ai_engine_product_path rescue "/admin/ai-engine/generate"
+%>
+
+<div class="my-2 rounded-lg border border-stone-200 bg-white p-4 mt-4">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-violet-50">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-violet-600 lucide lucide-sparkles">
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+          <path d="M20 3v4"/>
+          <path d="M22 5h-4"/>
+          <path d="M4 17v2"/>
+          <path d="M5 18H3"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-sm font-semibold text-stone-900">Generate Product Details</h3>
+        <p class="text-xs text-stone-500">Use AI to generate product name and description</p>
+      </div>
+    </div>
+    <button
+      id="ai-generate-btn"
+      class="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 shadow-sm transition-colors hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+      data-url="<%= generate_url %>"
+      <%= "disabled" unless has_ai_config %>
+      onclick="generateProductDetails(this)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/>
+        <path d="M22 5h-4"/>
+        <path d="M4 17v2"/>
+        <path d="M5 18H3"/>
+      </svg>
+      <span id="ai-generate-btn-text">Magic</span>
+      <svg id="ai-generate-spinner" class="hidden h-4 w-4 animate-spin text-violet-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </button>
+  </div>
+
+  <% unless has_ai_config %>
+    <p class="mt-2 text-xs text-stone-400">Add AI Model & Task first in <a href="<%= spree.admin_ai_engine_configs_path rescue '/admin/ai-engine-configs' %>" class="underline hover:text-stone-600">AI Settings</a></p>
+  <% end %>
+
+  <div id="ai-generate-error" class="hidden mt-3 rounded-md bg-red-50 p-3 text-xs text-red-600"></div>
+</div>
+
+<script>
+  function generateProductDetails(btn) {
+    var url = btn.getAttribute('data-url');
+    var btnText = document.getElementById('ai-generate-btn-text');
+    var spinner = document.getElementById('ai-generate-spinner');
+    var errorDiv = document.getElementById('ai-generate-error');
+
+    // Collect product context from the form
+    var nameField = document.querySelector('[id$="_product_name"]') || document.querySelector('input[name*="[name]"]');
+    var priceField = document.querySelector('[id$="_price"]') || document.querySelector('input[name*="[price]"]');
+    var categoryField = document.querySelector('[id$="_category"]') || document.querySelector('select[name*="[category_id]"]');
+
+    var payload = {
+      name: nameField ? nameField.value : '',
+      price: priceField ? priceField.value : '',
+      category: categoryField ? categoryField.options[categoryField.selectedIndex]?.text : ''
+    };
+
+    // Show loading state
+    btn.disabled = true;
+    btnText.textContent = 'Generating...';
+    spinner.classList.remove('hidden');
+    errorDiv.classList.add('hidden');
+
+    var csrfToken = document.querySelector('meta[name="csrf-token"]');
+    var token = csrfToken ? csrfToken.getAttribute('content') : '';
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': token,
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(response) {
+      return response.json().then(function(data) {
+        if (!response.ok) throw new Error(data.message || 'Generation failed');
+        return data;
+      });
+    })
+    .then(function(data) {
+      if (data.success) {
+        if (data.title) {
+          var nameInput = document.querySelector('[id$="_product_name"]') || document.querySelector('input[name*="[name]"]');
+          if (nameInput) {
+            nameInput.value = data.title;
+            nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
+
+        if (data.description) {
+          var descInput = document.getElementById('product_description');
+          if (descInput) {
+            if (typeof tinymce !== 'undefined' && tinymce.get('product_description')) {
+              tinymce.get('product_description').setContent(data.description);
+            } else {
+              descInput.value = data.description;
+              descInput.dispatchEvent(new Event('input', { bubbles: true }));
+              descInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          }
+        }
+
+        // Show success feedback
+        btnText.textContent = 'Done!';
+        btn.classList.add('border-green-200', 'bg-green-50', 'text-green-700');
+        setTimeout(function() {
+          btnText.textContent = 'Generate with AI';
+          btn.classList.remove('border-green-200', 'bg-green-50', 'text-green-700');
+          btn.disabled = false;
+        }, 2000);
+      } else {
+        throw new Error(data.message || 'Generation failed');
+      }
+    })
+    .catch(function(err) {
+      errorDiv.textContent = err.message || 'An error occurred while generating product details.';
+      errorDiv.classList.remove('hidden');
+      btnText.textContent = 'Generate with AI';
+      btn.disabled = false;
+    })
+    .finally(function() {
+      spinner.classList.add('hidden');
+    });
+  }
+</script>

@@ -1,4 +1,14 @@
 PATH
+  remote: engines/spree_ai_engine
+  specs:
+    spree_ai_engine (0.1.0)
+      faraday (~> 2.0)
+      rails (>= 7.0)
+      spree_admin (>= 5.5.0)
+      spree_api (>= 5.5.0)
+      spree_core (>= 5.5.0)
+
+PATH
   remote: engines/spree_courier_manager
   specs:
     spree_courier_manager (0.1.0)
@@ -989,6 +999,7 @@ DEPENDENCIES
   spree (>= 5.5.0.rc3)
   spree_admin (>= 5.5.0.rc3)
   spree_adyen
+  spree_ai_engine!
   spree_cod_payment (~> 2.1)
   spree_courier_manager!
   spree_dev_tools
@@ -1273,6 +1284,7 @@ CHECKSUMS
   spree (5.5.0) sha256=2bdc4ee6ce0d7f025d04ef8353ef35840cb488aa3052316e20a14128bb7df550
   spree_admin (5.5.0) sha256=2e9149cfa99c687a6d7cbedb6193fc5aa4558f32eacef6ebbebe77c9ad0ee1c0
   spree_adyen (0.11.0) sha256=f22941571d4cde4ae12fc7aa13f37d85005b71f2c9c2ff50ec8d1dceabfd564a
+  spree_ai_engine (0.1.0)
   spree_api (5.5.0) sha256=ee3ea3857841412b5d81fb43df71d5a9fd1ffc9773077392dc51ad25cd58d4c4
   spree_cod_payment (2.1.6) sha256=cf2edd8bc96297b2f923debf5951ac4b512683c5c9a15e771cac6e45a3a3aac7
   spree_core (5.5.0) sha256=0659e197da8620076e29718bb9460b1c01735a27dc707ede9b11460ba9e91c08

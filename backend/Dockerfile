@@ -30,6 +30,7 @@ RUN apt-get update -qq && \
 COPY .ruby-version Gemfile Gemfile.lock ./
 COPY engines/spree_pathao_courier/ engines/spree_pathao_courier/
 COPY engines/spree_courier_manager/ engines/spree_courier_manager/
+COPY engines/spree_ai_engine/ engines/spree_ai_engine/
 RUN bundle install && \
   rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
   bundle exec bootsnap precompile --gemfile
@@ -54,6 +55,11 @@ ENV RAILS_ENV="development" \
 # Install dev/test gems on top of the production bundle from the build stage.
 RUN bundle install && \
   rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
+
+# Precompile assets in dev so TinyMCE and other bundled JS assets are available.
+# After `spree eject` (bind-mount), re-run inside the container:
+#   docker compose exec web bin/rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Match the production image's user setup so file ownership (bind-mount,
 # bundle volume) is consistent across dev and prod.
