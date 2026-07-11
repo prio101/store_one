@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_07_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_09_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -634,6 +634,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_000005) do
     t.index ["status"], name: "index_spree_imports_on_status"
     t.index ["type"], name: "index_spree_imports_on_type"
     t.index ["user_id"], name: "index_spree_imports_on_user_id"
+  end
+
+  create_table "spree_instagram_publisher_configs", force: :cascade do |t|
+    t.string "app_id"
+    t.string "app_secret"
+    t.boolean "auto_publish", default: false
+    t.datetime "created_at", null: false
+    t.text "default_caption_template"
+    t.boolean "enabled", default: false, null: false
+    t.string "ig_business_account_id"
+    t.string "ig_profile_picture_url"
+    t.string "ig_username"
+    t.datetime "last_publish_at"
+    t.string "page_access_token"
+    t.string "page_id"
+    t.bigint "store_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_spree_instagram_publisher_configs_on_store_id", unique: true
   end
 
   create_table "spree_integrations", force: :cascade do |t|
@@ -2363,6 +2381,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_07_000005) do
   add_foreign_key "spree_courier_delivery_tracking_informations", "spree_orders", column: "order_id"
   add_foreign_key "spree_courier_delivery_tracking_informations", "spree_shipments", column: "shipment_id"
   add_foreign_key "spree_courier_integrations", "spree_stores", column: "store_id"
+  add_foreign_key "spree_instagram_publisher_configs", "spree_stores", column: "store_id"
   add_foreign_key "spree_option_type_translations", "spree_option_types"
   add_foreign_key "spree_option_value_translations", "spree_option_values"
   add_foreign_key "spree_pathao_courier_configs", "spree_stores", column: "store_id"

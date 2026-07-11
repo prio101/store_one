@@ -22,7 +22,7 @@ module SpreeAiEngine
           label: "AI Settings",
           url: -> { Spree::Core::Engine.routes.url_helpers.admin_ai_engine_configs_path },
           icon: "cpu",
-          position: 90
+          position: 94
       end
     end
   end

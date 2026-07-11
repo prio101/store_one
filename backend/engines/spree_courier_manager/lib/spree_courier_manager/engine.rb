@@ -22,7 +22,7 @@ module SpreeCourierManager
           label: :couriers,
           url: :admin_courier_integrations_path,
           icon: 'truck',
-          position: 85,
+          position: 92,
           if: -> { can?(:manage, Spree::CourierIntegration) }
       end
     end

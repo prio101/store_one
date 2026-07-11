@@ -1,0 +1,24 @@
+<%# frozen_string_literal: true %>
+<%# locals: (record:, column:, value:) %>
+<%
+  product = record
+  config = Spree::InstagramPublisherConfig.active.find_by(store: Spree::Current.store)
+%>
+
+<% if config.present? && config.resolved_ig_account? %>
+  <%= button_to publish_product_admin_instagram_publisher_config_path(config),
+      method: :post,
+      params: { product_id: product.id, redirect_to_table: 'true' },
+      class: 'd-inline',
+      form: { class: 'd-inline', data: { turbo: false } },
+      data: { confirm: "Publish '#{product.name}' to Instagram?" } do %>
+    <svg class="icon" width="14" height="14"><use href="#camera"></use></svg>
+    Publish
+  <% end %>
+<% elsif config.present? && config.enabled? %>
+  <span class="badge badge-warning" title="IG Business Account not configured">
+    Not configured
+  </span>
+<% else %>
+  <span class="text-muted">—</span>
+<% end %>

@@ -33,6 +33,11 @@ x-app: &app
     RAILS_FORCE_SSL: "false"
     RAILS_ASSUME_SSL: "false"
     MEILISEARCH_URL: http://meilisearch:7700
+    # DigitalOcean Spaces — same keys as production, dev bucket.
+    DO_SPACES_KEY: ${DO_SPACES_KEY:-}
+    DO_SPACES_SECRET: ${DO_SPACES_SECRET:-}
+    DO_SPACES_BUCKET: ${DO_SPACES_BUCKET:-minimeshop-dev}
+    DO_SPACES_REGION: ${DO_SPACES_REGION:-sgp1}
     # RAILS_ENV / BUNDLE_* are baked into the dev image (Dockerfile dev stage).
     BOOTSNAP_CACHE_DIR: /rails/tmp/cache/bootsnap
   volumes:
@@ -76,7 +81,7 @@ services:
       retries: 5
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:v1.48.1
     volumes:
       - meilisearch_data:/meili_data
     ports:

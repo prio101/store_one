@@ -1,0 +1,129 @@
+<%# frozen_string_literal: true %>
+
+<%= form_for @config, url: (@config.persisted? ? admin_instagram_publisher_config_path(@config) : admin_instagram_publisher_configs_path), method: @config.persisted? ? :patch : :post do |f| %>
+  <% if @config.errors.any? %>
+    <div class="alert alert-danger">
+      <h5><%= pluralize(@config.errors.count, 'error') %> prevented saving:</h5>
+      <ul>
+        <% @config.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset class="mb-4">
+    <legend class="form-label font-bold">Integration Status</legend>
+
+    <div class="form-group mb-3">
+      <%= f.label :enabled, 'Enable Instagram Integration', class: 'form-label font-bold' %>
+      <div class="form-check">
+        <%= f.check_box :enabled, class: 'form-check-input' %>
+        <%= f.label :enabled, 'Enable integration', class: 'form-check-label' %>
+      </div>
+    </div>
+  </fieldset>
+
+  <% if @config.enabled? %>
+    <fieldset class="mb-4">
+      <legend class="form-label font-bold">Facebook App Credentials</legend>
+
+      <div class="form-group mb-3">
+        <%= f.label :app_id, 'Facebook App ID', class: 'form-label font-bold' %>
+        <%= f.text_field :app_id, class: 'form-control', required: true %>
+        <small class="form-text text-muted">
+          Found in your Facebook App Dashboard → Settings → Basic
+        </small>
+      </div>
+
+      <div class="form-group mb-3">
+        <%= f.label :app_secret, 'Facebook App Secret', class: 'form-label font-bold' %>
+        <%= f.password_field :app_secret, class: 'form-control',
+            placeholder: @config.persisted? && @config.app_secret.present? ? 'Leave blank to keep current' : '',
+            autocomplete: 'off' %>
+        <% if @config.persisted? && @config.app_secret.present? %>
+          <small class="form-text text-muted">Leave blank to keep existing value.</small>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+      <legend class="form-label font-bold">Page & Account Settings</legend>
+
+      <div class="form-group mb-3">
+        <%= f.label :page_id, 'Facebook Page ID', class: 'form-label font-bold' %>
+        <%= f.text_field :page_id, class: 'form-control', required: true %>
+        <small class="form-text text-muted">
+          The Facebook Page linked to your Instagram Business account
+        </small>
+      </div>
+
+      <div class="form-group mb-3">
+        <%= f.label :page_access_token, 'Page Access Token', class: 'form-label font-bold' %>
+        <%= f.password_field :page_access_token, class: 'form-control',
+            placeholder: @config.persisted? && @config.page_access_token.present? ? 'Leave blank to keep current' : '',
+            autocomplete: 'off' %>
+        <small class="form-text text-muted">
+          Long-lived Page Access Token from Facebook Graph API Explorer.
+          <% if @config.persisted? && @config.page_access_token.present? %>
+            Leave blank to keep existing value.
+          <% end %>
+        </small>
+      </div>
+
+      <div class="form-group mb-3">
+        <%= f.label :ig_business_account_id, 'Instagram Business Account ID', class: 'form-label font-bold' %>
+        <%= f.text_field :ig_business_account_id, class: 'form-control' %>
+        <small class="form-text text-muted">
+          Auto-resolved from Page ID on save. You can override manually if needed.
+        </small>
+      </div>
+
+      <% if @config.ig_username.present? %>
+        <div class="form-group mb-3">
+          <label class="form-label font-bold">Connected Instagram Account</label>
+          <div class="d-flex align-items-center">
+            <% if @config.ig_profile_picture_url.present? %>
+              <img src="<%= @config.ig_profile_picture_url %>" alt="Instagram Profile" class="rounded-circle me-2" width="32" height="32">
+            <% end %>
+            <span>@<%= @config.ig_username %></span>
+          </div>
+        </div>
+      <% end %>
+    </fieldset>
+
+    <fieldset class="mb-4">
+      <legend class="form-label font-bold">Publishing Settings</legend>
+
+      <div class="form-group mb-3">
+        <%= f.label :default_caption_template, 'Default Caption Template', class: 'form-label font-bold' %>
+        <%= f.text_area :default_caption_template, class: 'form-control', rows: 4,
+            placeholder: "{product_name}\n\nPrice: {price}\n\nShop now: {url}" %>
+        <small class="form-text text-muted">
+          Available placeholders: <code>{product_name}</code>, <code>{price}</code>, <code>{url}</code>.
+          Leave blank for the default template.
+        </small>
+      </div>
+
+      <div class="form-group mb-3">
+        <%= f.label :auto_publish, 'Auto-publish', class: 'form-label font-bold' %>
+        <div class="form-check">
+          <%= f.check_box :auto_publish, class: 'form-check-input' %>
+          <%= f.label :auto_publish, 'Automatically publish products when created or updated', class: 'form-check-label' %>
+        </div>
+      </div>
+
+      <% if @config.last_publish_at.present? %>
+        <div class="form-group mb-3">
+          <label class="form-label font-bold">Last Published</label>
+          <p class="form-control-plaintext"><%= @config.last_publish_at.strftime('%B %d, %Y at %I:%M %p') %></p>
+        </div>
+      <% end %>
+    </fieldset>
+  <% end %>
+
+  <div class="form-actions">
+    <%= f.submit (@config.persisted? ? 'Update Configuration' : 'Save Configuration'),
+        class: 'btn btn-primary' %>
+  </div>
+<% end %>

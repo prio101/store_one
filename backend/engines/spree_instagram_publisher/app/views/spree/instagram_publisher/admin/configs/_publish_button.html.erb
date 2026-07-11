@@ -1,0 +1,48 @@
+<%# frozen_string_literal: true %>
+<%# Rendered on the admin product edit page to allow publishing to Instagram %>
+
+<% config = Spree::InstagramPublisherConfig.active.find_by(store: Spree::Current.store) %>
+
+<% if config.present? && config.resolved_ig_account? %>
+  <div class="card mb-3">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <svg class="icon" width="16" height="16"><use href="#camera"></use></svg>
+        Instagram Publisher
+      </h6>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-2">
+        Publish to <strong>@<%= config.ig_username %></strong>
+      </p>
+      <%= button_to 'Publish to Instagram',
+          publish_product_admin_instagram_publisher_config_path(config),
+          method: :post,
+          params: { product_id: @product.id },
+          class: 'btn btn-primary btn-sm w-100',
+          form: { data: { turbo: false } },
+          data: { confirm: "Publish \"#{@product.name}\" to Instagram?\n\nThis will post the product image and details to your Instagram page." } %>
+      <% if config.last_publish_at.present? %>
+        <p class="text-muted small mt-2 mb-0">
+          Last published: <%= spree_time_ago(config.last_publish_at) %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+<% elsif config.present? && config.enabled? %>
+  <div class="card mb-3">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <svg class="icon" width="16" height="16"><use href="#camera"></use></svg>
+        Instagram Publisher
+      </h6>
+    </div>
+    <div class="card-body">
+      <p class="text-warning small mb-2">
+        Instagram integration is enabled but the IG Business Account is not configured.
+      </p>
+      <%= link_to 'Configure Instagram', edit_admin_instagram_publisher_config_path(config),
+          class: 'btn btn-outline-secondary btn-sm' %>
+    </div>
+  </div>
+<% end %>

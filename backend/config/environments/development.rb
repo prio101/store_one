@@ -50,8 +50,13 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Store uploaded files — use DigitalOcean Spaces in dev when DO_SPACES_* env vars are set,
+  # otherwise fall back to local disk.
+  if ENV["DO_SPACES_KEY"].present? && ENV["DO_SPACES_SECRET"].present?
+    config.active_storage.service = :amazon
+  else
+    config.active_storage.service = :local
+  end
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
