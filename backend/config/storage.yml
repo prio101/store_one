@@ -13,7 +13,6 @@ amazon:
   secret_access_key: <%= ENV.fetch("DO_SPACES_SECRET", "") %>
   region: <%= ENV.fetch("DO_SPACES_REGION", "sgp1") %>
   bucket: <%= ENV.fetch("DO_SPACES_BUCKET", "minimeshop-bucket") %>
-  prefix: <%= ENV.fetch("DO_SPACES_PREFIX", Rails.env.production? ? "prod" : "dev") %>
   # NOTE: Do NOT set public: true here — it adds x-amz-acl and signs
   # content-md5 in the presigned PUT URL, which DigitalOcean Spaces rejects
   # because the browser XHR upload doesn't send Content-MD5.

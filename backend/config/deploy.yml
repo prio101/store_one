@@ -34,6 +34,7 @@ env:
     - DO_SPACES_SECRET
     - DO_SPACES_BUCKET
     - DO_SPACES_REGION
+    - DO_SPACES_ENDPOINT
 
 accessories:
   db:

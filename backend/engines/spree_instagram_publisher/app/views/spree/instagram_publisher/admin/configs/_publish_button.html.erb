@@ -15,13 +15,14 @@
       <p class="text-muted small mb-2">
         Publish to <strong>@<%= config.ig_username %></strong>
       </p>
-      <%= button_to 'Publish to Instagram',
-          publish_product_admin_instagram_publisher_config_path(config),
-          method: :post,
-          params: { product_id: @product.id },
-          class: 'btn btn-primary btn-sm w-100',
-          form: { data: { turbo: false } },
-          data: { confirm: "Publish \"#{@product.name}\" to Instagram?\n\nThis will post the product image and details to your Instagram page." } %>
+      <%= link_to publish_product_admin_instagram_publisher_config_path(config, product_id: @product.id),
+          class: 'btn btn-primary btn-sm',
+          data: {
+            turbo_method: :post,
+            turbo_confirm: "Publish \"#{@product.name}\" to Instagram?\n\nThis will post the product image and details to your Instagram page."
+          } do %>
+        Publish to Instagram
+      <% end %>
       <% if config.last_publish_at.present? %>
         <p class="text-muted small mt-2 mb-0">
           Last published: <%= spree_time_ago(config.last_publish_at) %>
