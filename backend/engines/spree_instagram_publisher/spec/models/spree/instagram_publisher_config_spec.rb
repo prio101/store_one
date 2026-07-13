@@ -94,7 +94,7 @@ RSpec.describe Spree::InstagramPublisherConfig, type: :model do
   describe '#graph_api_url' do
     it 'returns the Graph API base URL with version' do
       config = build(:instagram_publisher_config)
-      expect(config.graph_api_url).to eq('https://graph.facebook.com/v21.0')
+      expect(config.graph_api_url).to eq('https://graph.facebook.com/v25.0')
     end
   end
 

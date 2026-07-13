@@ -6,6 +6,7 @@ module Spree
 
     encrypts :app_secret
     encrypts :page_access_token
+    encrypts :long_lived_token
 
     validates :store, presence: true, uniqueness: true
     validates :app_id, presence: true, if: :enabled?
@@ -15,11 +16,16 @@ module Spree
 
     scope :active, -> { where(enabled: true) }
 
-    GRAPH_API_VERSION = 'v21.0'.freeze
+    GRAPH_API_VERSION = 'v25.0'.freeze
     GRAPH_API_BASE_URL = "https://graph.facebook.com/#{GRAPH_API_VERSION}".freeze
 
     def graph_api_url
       GRAPH_API_BASE_URL
+    end
+
+    # Returns the best available token: long-lived preferred, fallback to short-lived.
+    def active_token
+      long_lived_token.presence || page_access_token
     end
 
     def resolved_ig_account?
@@ -28,11 +34,19 @@ module Spree
 
     def caption_for(product:, url: nil)
       template = default_caption_template.presence ||
-        "{product_name}\n\nPrice: {price}\n\nShop now: {url}"
+        "{product_name}\n\n{description}\n\n💰 Price: {price} | Last Updated at: {updated_at}\n(Check the Website for latest Price)\n\n🛒 Shop now: {url}"
+
+      description = product.description.to_s
+      # Strip HTML tags if present (TinyMCE output)
+      description = ActionController::Base.helpers.strip_tags(description).strip if description.include?('<')
+      # Truncate to 500 chars for Instagram
+      description = "#{description[0..497]}..." if description.length > 500
 
       caption = template
         .gsub('{product_name}', product.name.to_s)
+        .gsub('{description}', description)
         .gsub('{price}', format_price(product))
+        .gsub('{updated_at}', Time.current.strftime('%b %d, %Y %I:%M %p'))
         .gsub('{url}', url.to_s)
 
       caption.strip
@@ -42,9 +56,13 @@ module Spree
 
     def format_price(product)
       price = product.price
-      return price.to_s unless price.respond_to?(:money)
+      return 'N/A' if price.blank?
 
-      price.money.format
+      if price.respond_to?(:money)
+        "৳#{'%.2f' % price.money.amount}"
+      else
+        "৳#{'%.2f' % price.to_f}"
+      end
     end
   end
 end

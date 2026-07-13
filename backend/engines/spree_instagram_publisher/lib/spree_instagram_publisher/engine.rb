@@ -22,5 +22,9 @@ module SpreeInstagramPublisher
           if: -> { can?(:manage, Spree::InstagramPublisherConfig) }
       end
     end
+
+    rake_tasks do
+      load 'tasks/instagram_publisher.rake'
+    end
   end
 end

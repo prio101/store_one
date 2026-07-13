@@ -59,17 +59,39 @@
       </div>
 
       <div class="form-group mb-3">
-        <%= f.label :page_access_token, 'Page Access Token', class: 'form-label font-bold' %>
+        <%= f.label :page_access_token, 'Short-Lived Page Access Token', class: 'form-label font-bold' %>
         <%= f.password_field :page_access_token, class: 'form-control',
             placeholder: @config.persisted? && @config.page_access_token.present? ? 'Leave blank to keep current' : '',
             autocomplete: 'off' %>
         <small class="form-text text-muted">
-          Long-lived Page Access Token from Facebook Graph API Explorer.
+          Paste the token from Facebook Graph API Explorer here.
           <% if @config.persisted? && @config.page_access_token.present? %>
             Leave blank to keep existing value.
           <% end %>
         </small>
       </div>
+
+      <% if @config.persisted? && @config.page_access_token.present? %>
+        <div class="form-group mb-3">
+          <label class="form-label font-bold">Exchange for Long-Lived Token</label>
+          <div class="d-flex align-items-center gap-2">
+            <% if @config.long_lived_token.present? %>
+              <%= f.password_field :long_lived_token, class: 'form-control', readonly: true,
+                  value: @config.long_lived_token, autocomplete: 'off' %>
+              <span class="badge bg-success">Active</span>
+            <% else %>
+              <span class="text-muted small me-2">No long-lived token yet</span>
+            <% end %>
+            <%= link_to 'Exchange Token',
+                exchange_token_admin_instagram_publisher_config_path(@config),
+                class: "btn btn-outline-primary btn-sm",
+                data: { turbo_method: :post, turbo_confirm: 'Exchange the short-lived token for a long-lived token (~60 days validity)?' } %>
+          </div>
+          <small class="form-text text-muted">
+            Exchanges your short-lived token for a long-lived token valid for ~60 days.
+          </small>
+        </div>
+      <% end %>
 
       <div class="form-group mb-3">
         <%= f.label :ig_business_account_id, 'Instagram Business Account ID', class: 'form-label font-bold' %>
@@ -100,7 +122,7 @@
         <%= f.text_area :default_caption_template, class: 'form-control', rows: 4,
             placeholder: "{product_name}\n\nPrice: {price}\n\nShop now: {url}" %>
         <small class="form-text text-muted">
-          Available placeholders: <code>{product_name}</code>, <code>{price}</code>, <code>{url}</code>.
+          Available placeholders: <code>{product_name}</code>, <code>{description}</code>, <code>{price}</code>, <code>{updated_at}</code>, <code>{url}</code>.
           Leave blank for the default template.
         </small>
       </div>

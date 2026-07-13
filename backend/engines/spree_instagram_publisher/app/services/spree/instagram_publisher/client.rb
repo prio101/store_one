@@ -48,7 +48,7 @@ module Spree
 
         response = connection.send(method) do |req|
           req.url path
-          req.headers['Authorization'] = "Bearer #{config.page_access_token}"
+          req.headers['Authorization'] = "Bearer #{config.active_token}"
           req.headers['Content-Type'] = 'application/json'
 
           case method
@@ -75,10 +75,30 @@ module Spree
         error_info = data.is_a?(Hash) ? data['error'] : nil
         message = error_info.is_a?(Hash) ? (error_info['message'] || response.body) : response.body
         error_subcode = error_info.is_a?(Hash) ? error_info['error_subcode'] : nil
+        error_code = error_info.is_a?(Hash) ? error_info['code'] : nil
 
         case response.status
         when 401
+          token = config.active_token
+          token_type = config.long_lived_token.present? ? 'long-lived' : 'short-lived'
+          Rails.logger.error("[InstagramPublisher::Client] 401 Authentication Error — " \
+            "using #{token_type} token, token_present: #{token.present?}, token_length: #{token&.length}, " \
+            "token_preview: #{token.present? ? "#{token[0..5]}…#{token[-4..]}" : "N/A"}, " \
+            "error_subcode: #{error_subcode}, message: #{message}")
+
           raise Spree::InstagramPublisher::AuthenticationError, "Instagram authentication failed (401): #{message}"
+        when 400
+          Rails.logger.error("[InstagramPublisher::Client] 400 Bad Request — " \
+            "error_code: #{error_code}, error_subcode: #{error_subcode}, message: #{message}")
+
+          if message&.include?('Unsupported post request')
+            raise Spree::InstagramPublisher::ApiError,
+              "Instagram API error (400): #{message}\n" \
+              "Hint: The Instagram Business Account ID may be incorrect or the account may not support content publishing. " \
+              "Verify the account ID in the admin panel."
+          end
+
+          raise Spree::InstagramPublisher::ApiError, "Instagram API error (400): #{message}"
         when 429
           raise Spree::InstagramPublisher::RateLimitError, "Instagram API rate limit exceeded (429): #{message}"
         else

@@ -23,12 +23,12 @@ module Spree
         end
 
         Rails.logger.info("[InstagramPublisher::MediaCreator] POST /#{ig_user_id}/media — " \
-          "image_url: #{image_url[0..100]}, caption_length: #{caption.length}")
+          "image_url: #{image_url[0..100]}, caption_length: #{caption&.length || 0}")
 
-        response = @client.post("/#{ig_user_id}/media", {
-          image_url: image_url,
-          caption: caption
-        })
+        payload = { image_url: image_url }
+        payload[:caption] = caption if caption.present?
+
+        response = @client.post("/#{ig_user_id}/media", payload)
 
         Rails.logger.info("[InstagramPublisher::MediaCreator] create_container response: #{response.inspect[0..500]}")
 
