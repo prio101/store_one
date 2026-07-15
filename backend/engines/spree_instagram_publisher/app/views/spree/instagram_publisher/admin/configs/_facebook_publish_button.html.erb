@@ -1,0 +1,44 @@
+<%# frozen_string_literal: true %>
+<%# Rendered on the admin product edit page to allow publishing to Facebook %>
+
+<% config = Spree::InstagramPublisherConfig.active.find_by(store: Spree::Current.store) %>
+
+<% if config.present? && config.page_id.present? %>
+  <div class="card mb-3">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <svg class="icon" width="16" height="16"><use href="#camera"></use></svg>
+        Facebook Publisher
+      </h6>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-2">
+        Publish to Facebook Page
+      </p>
+      <%= link_to publish_to_facebook_admin_instagram_publisher_config_path(config, product_id: @product.id),
+          class: 'btn btn-primary btn-sm',
+          data: {
+            turbo_method: :post,
+            turbo_confirm: "Publish \"#{@product.name}\" to Facebook?\n\nThis will post the product image and details to your Facebook page."
+          } do %>
+        Publish to Facebook
+      <% end %>
+    </div>
+  </div>
+<% elsif config.present? && config.enabled? %>
+  <div class="card mb-3">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <svg class="icon" width="16" height="16"><use href="#camera"></use></svg>
+        Facebook Publisher
+      </h6>
+    </div>
+    <div class="card-body">
+      <p class="text-warning small mb-2">
+        Facebook integration is enabled but the Page ID is not configured.
+      </p>
+      <%= link_to 'Configure Facebook', edit_admin_instagram_publisher_config_path(config),
+          class: 'btn btn-outline-secondary btn-sm' %>
+    </div>
+  </div>
+<% end %>

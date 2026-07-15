@@ -52,6 +52,27 @@ module Spree
       caption.strip
     end
 
+    # Facebook caption template (similar to Instagram but with Facebook-specific formatting)
+    def facebook_caption_for(product:, url: nil)
+      template = facebook_caption_template.presence ||
+        "{product_name}\n\n{description}\n\n💰 Price: {price} | Last Updated at: {updated_at}\n\n🛒 Shop now: {url}"
+
+      description = product.description.to_s
+      # Strip HTML tags if present (TinyMCE output)
+      description = ActionController::Base.helpers.strip_tags(description).strip if description.include?('<')
+      # Truncate to 1000 chars for Facebook (higher limit than Instagram)
+      description = "#{description[0..997]}..." if description.length > 1000
+
+      caption = template
+        .gsub('{product_name}', product.name.to_s)
+        .gsub('{description}', description)
+        .gsub('{price}', format_price(product))
+        .gsub('{updated_at}', Time.current.strftime('%b %d, %Y %I:%M %p'))
+        .gsub('{url}', url.to_s)
+
+      caption.strip
+    end
+
     private
 
     def format_price(product)

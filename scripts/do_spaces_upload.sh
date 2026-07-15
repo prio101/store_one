@@ -13,7 +13,16 @@ set -euo pipefail
 # ── Load .env ─────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+KAMAL_SECRETS="$PROJECT_ROOT/backend/.kamal/secrets"
 ENV_FILE="$PROJECT_ROOT/.env"
+
+# Source kamal secrets first (contains DO_SPACES_* for deploy),
+# then root .env (for local dev overrides).
+if [[ -f "$KAMAL_SECRETS" ]]; then
+  set -a
+  source <(grep -v '^#' "$KAMAL_SECRETS" | grep -v '^\s*$')
+  set +a
+fi
 
 if [[ -f "$ENV_FILE" ]]; then
   set -a

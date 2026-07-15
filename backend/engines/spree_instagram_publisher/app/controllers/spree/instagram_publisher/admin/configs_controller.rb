@@ -4,7 +4,7 @@ module Spree
   module InstagramPublisher
     module Admin
       class ConfigsController < Spree::Admin::BaseController
-        before_action :load_config, only: %i[edit update publish_product exchange_token]
+        before_action :load_config, only: %i[edit update publish_product publish_to_facebook exchange_token]
 
         def index
           add_breadcrumb 'Instagram'
@@ -138,6 +138,40 @@ module Spree
                       alert: "An error occurred while publishing to Instagram: #{e.message}"
         end
 
+        # POST /admin/instagram_publisher_configs/:id/publish_to_facebook
+        def publish_to_facebook
+          product = Spree::Product.find(params[:product_id])
+
+          Rails.logger.info("[FacebookPublisher] ▶ publish_to_facebook — product_id: #{product.id}, " \
+            "config_id: #{@config.id}, enabled: #{@config.enabled}, page_id: #{@config.page_id.inspect}")
+
+          unless @config.enabled? && @config.page_id.present?
+            Rails.logger.warn("[FacebookPublisher] ✘ config not ready — enabled: #{@config.enabled}, " \
+              "page_id: #{@config.page_id.inspect}")
+            redirect_to edit_admin_instagram_publisher_config_path(@config),
+                        alert: 'Facebook integration is not properly configured. Please enable and configure the integration first.'
+            return
+          end
+
+          publisher = Spree::FacebookPublisher::Publisher.new(@config)
+          result = publisher.publish(product: product)
+
+          Rails.logger.info("[FacebookPublisher] result — success: #{result[:success]}, " \
+            "post_id: #{result[:post_id].inspect}, error: #{result[:error].inspect}")
+
+          if result[:success]
+            redirect_to after_publish_redirect(product),
+                        notice: "Product published to Facebook successfully. Post ID: #{result[:post_id]}"
+          else
+            redirect_to after_publish_redirect(product),
+                        alert: "Failed to publish to Facebook: #{result[:error]}"
+          end
+        rescue => e
+          Rails.logger.error("[FacebookPublisher] ✘ publish_to_facebook EXCEPTION: #{e.class} — #{e.message}\n#{e.backtrace&.first(10)&.join("\n")}")
+          redirect_to after_publish_redirect(product),
+                      alert: "An error occurred while publishing to Facebook: #{e.message}"
+        end
+
         private
 
         def load_config
@@ -149,7 +183,7 @@ module Spree
             :store_id, :enabled, :app_id, :app_secret,
             :page_id, :page_access_token, :long_lived_token,
             :ig_business_account_id,
-            :default_caption_template, :auto_publish
+            :default_caption_template, :facebook_caption_template, :auto_publish
           )
 
           # Strip empty values from encrypted fields so blank submits don't overwrite existing tokens

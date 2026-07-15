@@ -7,6 +7,7 @@ Spree::Core::Engine.add_routes do
               except: [:destroy] do
       member do
         post :publish_product
+        post :publish_to_facebook
         post :exchange_token
       end
     end

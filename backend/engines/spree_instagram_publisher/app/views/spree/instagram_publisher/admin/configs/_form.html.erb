@@ -118,8 +118,18 @@
       <legend class="form-label font-bold">Publishing Settings</legend>
 
       <div class="form-group mb-3">
-        <%= f.label :default_caption_template, 'Default Caption Template', class: 'form-label font-bold' %>
+        <%= f.label :default_caption_template, 'Instagram Caption Template', class: 'form-label font-bold' %>
         <%= f.text_area :default_caption_template, class: 'form-control', rows: 4,
+            placeholder: "{product_name}\n\nPrice: {price}\n\nShop now: {url}" %>
+        <small class="form-text text-muted">
+          Available placeholders: <code>{product_name}</code>, <code>{description}</code>, <code>{price}</code>, <code>{updated_at}</code>, <code>{url}</code>.
+          Leave blank for the default template.
+        </small>
+      </div>
+
+      <div class="form-group mb-3">
+        <%= f.label :facebook_caption_template, 'Facebook Caption Template', class: 'form-label font-bold' %>
+        <%= f.text_area :facebook_caption_template, class: 'form-control', rows: 4,
             placeholder: "{product_name}\n\nPrice: {price}\n\nShop now: {url}" %>
         <small class="form-text text-muted">
           Available placeholders: <code>{product_name}</code>, <code>{description}</code>, <code>{price}</code>, <code>{updated_at}</code>, <code>{url}</code>.
