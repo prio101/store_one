@@ -15,6 +15,7 @@ puts "🌱 Seeding minimeshop.net development data..."
 # ── 2. Roles ─────────────────────────────────────────────────────────────
 admin_role = Spree::Role.find_or_create_by!(name: 'admin')
 user_role  = Spree::Role.find_or_create_by!(name: 'user')
+customer_support_role = Spree::Role.find_or_create_by!(name: 'customer_support')
 puts "  ✓ Roles"
 
 # ── 3. Admin user ────────────────────────────────────────────────────────
@@ -28,6 +29,18 @@ if admin.new_record?
 end
 admin.spree_roles << admin_role unless admin.spree_roles.include?(admin_role)
 puts "  ✓ Admin user (admin@minimeshop.net / password123)"
+
+# ── 3b. Customer Support User (CRU) ─────────────────────────────────────
+cru = Spree::AdminUser.find_or_initialize_by(email: 'cru@minimeshop.net')
+if cru.new_record?
+  cru.password = 'password123'
+  cru.password_confirmation = 'password123'
+  cru.first_name = 'Customer'
+  cru.last_name = 'Support'
+  cru.save!
+end
+cru.spree_roles << customer_support_role unless cru.spree_roles.include?(customer_support_role)
+puts "  ✓ Customer Support user (cru@minimeshop.net / password123)"
 
 # ── 4. Store configuration ──────────────────────────────────────────────
 bangladesh = Spree::Country.find_by!(iso: 'BD')

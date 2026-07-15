@@ -1,0 +1,194 @@
+<%# frozen_string_literal: true %>
+
+<div class="flex flex-1 flex-row">
+  <!-- Ticket Details -->
+  <div class="flex flex-1 flex-col col-md-8 m-2">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-2xl">
+          <span class="text-xl font-bold"><%= @ticket.ticket_number %></span>
+          <%= @ticket.title %>
+        </h5>
+        <div class="flex gap-2">
+          <% case @ticket.status %>
+          <% when 'pending' %>
+            <span class="p-2 badge bg-warning text-white">Pending</span>
+          <% when 'in_progress' %>
+            <span class="p-2 badge bg-primary text-white">In Progress</span>
+          <% when 'resolved' %>
+            <span class="p-2 badge bg-success text-white">Resolved</span>
+          <% when 'ask_for_more_clarification' %>
+            <span class="p-2 badge bg-info text-white">Ask for Clarification</span>
+          <% when 'closed' %>
+            <span class="p-2 badge bg-secondary text-white">Closed</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <strong>User:</strong> <%= @ticket.user.email %><br>
+            <strong>Order:</strong> <%= @ticket.order_number %><br>
+            <strong>Subject:</strong> <span class="p-2 badge bg-info text-white"><%= @ticket.subject.humanize %></span>
+          </div>
+          <div class="col-md-6">
+            <strong>Priority:</strong>
+            <% case @ticket.priority %>
+            <% when 'high' %>
+              <span class="p-2 badge bg-danger text-white">High</span>
+            <% when 'medium' %>
+              <span class="p-2 badge bg-warning text-white">Medium</span>
+            <% when 'low' %>
+              <span class="p-2 badge bg-secondary text-white">Low</span>
+            <% end %>
+            <br>
+            <strong>Assigned To:</strong> <%= @ticket.assigned_to&.full_name || 'Unassigned' %><br>
+            <strong>Created:</strong> <%= @ticket.created_at.strftime('%b %d, %Y %H:%M') %>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="mb-3">
+          <strong>Description:</strong>
+          <div class="p-3 bg-light rounded mt-2">
+            <%= simple_format(@ticket.body) %>
+          </div>
+        </div>
+
+        <% if @ticket.image.attached? %>
+          <div class="mb-3">
+            <strong>Attached Image:</strong>
+            <div class="mt-2">
+              <%= image_tag main_app.rails_blob_path(@ticket.image), class: 'img-fluid rounded', style: 'max-height: 300px;' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">Messages & History</h6>
+      </div>
+      <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+        <% if @messages.any? %>
+          <% @messages.each do |message| %>
+            <div class="border-start border-3 <%= message.is_internal_note? ? 'border-warning' : 'border-primary' %> ps-3 mb-4">
+              <div class="d-flex justify-content-between">
+                <strong>
+                  <%= message.sender_type == 'Spree::AdminUser' ? 'CRU' : 'User' %>:
+                  <%= message.sender.respond_to?(:full_name) ? message.sender.full_name : message.sender.email %>
+                </strong>
+                <small class="text-muted"><%= message.created_at.strftime('%b %d, %Y %H:%M') %></small>
+              </div>
+              <div class="mt-1 border p-2 rounded bg-green-100">
+                <%= simple_format(message.body) %>
+              </div>
+              <% if message.resolution_summary.present? %>
+                <div class="mt-2 p-2 bg-success bg-opacity-10 rounded">
+                  <strong>Resolution Summary:</strong> <%= message.resolution_summary %>
+                </div>
+              <% end %>
+              <% if message.action_taken.present? %>
+                <div class="mt-1">
+                  <strong>Action Taken:</strong> <span class="badge bg-warning text-dark"><%= message.action_taken.humanize %></span>
+                </div>
+              <% end %>
+              <% if message.is_internal_note? %>
+                <div class="mt-1">
+                  <span class="badge bg-warning text-dark">Internal Note</span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-muted">No messages yet.</p>
+        <% end %>
+      </div>
+
+      <!-- Add Message -->
+      <div class="p-3 bg-light border-top">
+        <strong>Add Message:</strong>
+        <div class="mt-2">
+          <%= form_tag create_message_admin_support_ticket_path(@ticket), method: :post do %>
+            <div class="mb-2">
+              <%= text_area_tag 'support_ticket[body]', nil, class: 'form-control', rows: 3, placeholder: 'Type your message...' %>
+            </div>
+            <div class="mb-2">
+              <div class="form-check">
+                <%= check_box_tag 'support_ticket[is_internal_note]', '1', false, class: 'form-check-input' %>
+                <%= label_tag 'support_ticket[is_internal_note]', 'Internal Note', class: 'form-check-label' %>
+              </div>
+            </div>
+            <%= submit_tag 'Send Message', class: 'btn btn-primary' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions Sidebar -->
+  <div class="flex flex-1 flex-col col-md-4 m-2">
+    <!-- Quick Actions -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0">Quick Actions</h6>
+      </div>
+      <div class="card-body">
+        <!-- Status Update -->
+        <div class="mb-3">
+          <strong>Update Status:</strong>
+          <div class="mt-2">
+            <%= form_tag update_status_admin_support_ticket_path(@ticket), method: :post, class: 'd-grid gap-2' do %>
+              <%= select_tag :status, options_for_select(
+                Spree::SupportTicket.statuses.map { |k, v| [k.humanize, k] },
+                @ticket.status
+              ), class: 'form-select' %>
+              <%= submit_tag 'Update Status', class: 'btn btn-primary' %>
+            <% end %>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Assign Ticket -->
+        <div class="mb-3">
+          <strong>Assign To:</strong>
+          <div class="mt-2">
+            <%= form_tag assign_admin_support_ticket_path(@ticket), method: :post, class: 'd-grid gap-2' do %>
+              <%= select_tag :assigned_to_id, options_from_collection_for_select(
+                Spree::AdminUser.joins(:spree_roles).where(spree_roles: { name: 'customer_support' }),
+                :id, :full_name
+              ), include_blank: 'Auto-Assign', class: 'form-select' %>
+              <%= submit_tag 'Assign', class: 'btn btn-primary' %>
+            <% end %>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Resolve Ticket -->
+        <div class="mb-3 flex flex-1 flex-col">
+          <strong>Resolve Ticket:</strong>
+          <div class="mt-2">
+            <%= form_tag resolve_admin_support_ticket_path(@ticket), method: :post do %>
+              <div class="mb-2">
+                <%= text_area_tag :resolution_summary, nil, class: 'form-control', rows: 3, placeholder: 'Resolution summary (required)...' %>
+              </div>
+              <div class="mb-2">
+                <%= select_tag :action_taken, options_for_select(
+                  Spree::SupportTicketMessage.action_takens.map { |k, v| [k.humanize, k] }
+                ), include_blank: 'Select Action (optional)', class: 'form-select' %>
+              </div>
+              <%= submit_tag 'Resolve', class: 'w-full btn btn-primary' %>
+            <% end %>
+          </div>
+        </div>
+
+        <hr>
+      </div>
+    </div>
+  </div>
+</div>

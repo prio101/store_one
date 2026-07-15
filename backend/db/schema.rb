@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -2030,6 +2030,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
     t.index ["stripe_id"], name: "index_spree_stripe_webhook_keys_on_stripe_id", unique: true
   end
 
+  create_table "spree_support_ticket_messages", force: :cascade do |t|
+    t.integer "action_taken"
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.boolean "is_internal_note", default: false, null: false
+    t.text "resolution_summary"
+    t.bigint "sender_id", null: false
+    t.string "sender_type", null: false
+    t.bigint "support_ticket_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sender_type", "sender_id"], name: "index_support_ticket_messages_on_sender"
+    t.index ["support_ticket_id"], name: "index_spree_support_ticket_messages_on_support_ticket_id"
+  end
+
+  create_table "spree_support_tickets", force: :cascade do |t|
+    t.bigint "assigned_to_id"
+    t.text "body", null: false
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.string "order_number", null: false
+    t.integer "priority", default: 2, null: false
+    t.jsonb "private_metadata", default: {}
+    t.jsonb "public_metadata", default: {}
+    t.datetime "resolved_at"
+    t.integer "status", default: 0, null: false
+    t.bigint "store_id", null: false
+    t.integer "subject", default: 0, null: false
+    t.string "ticket_number", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["assigned_to_id"], name: "index_spree_support_tickets_on_assigned_to_id"
+    t.index ["order_number"], name: "index_spree_support_tickets_on_order_number"
+    t.index ["priority"], name: "index_spree_support_tickets_on_priority"
+    t.index ["status"], name: "index_spree_support_tickets_on_status"
+    t.index ["store_id"], name: "index_spree_support_tickets_on_store_id"
+    t.index ["ticket_number"], name: "index_spree_support_tickets_on_ticket_number", unique: true
+    t.index ["user_id"], name: "index_spree_support_tickets_on_user_id"
+  end
+
   create_table "spree_taggings", force: :cascade do |t|
     t.string "context", limit: 128
     t.datetime "created_at", precision: nil
@@ -2391,6 +2431,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
   add_foreign_key "spree_payment_sources", "spree_users", column: "user_id"
   add_foreign_key "spree_product_translations", "spree_products"
   add_foreign_key "spree_store_translations", "spree_stores"
+  add_foreign_key "spree_support_ticket_messages", "spree_support_tickets", column: "support_ticket_id"
+  add_foreign_key "spree_support_tickets", "spree_admin_users", column: "assigned_to_id"
+  add_foreign_key "spree_support_tickets", "spree_stores", column: "store_id"
+  add_foreign_key "spree_support_tickets", "spree_users", column: "user_id"
   add_foreign_key "spree_taxon_translations", "spree_taxons"
   add_foreign_key "spree_taxonomy_translations", "spree_taxonomies"
 end

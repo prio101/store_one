@@ -32,6 +32,7 @@ COPY engines/spree_pathao_courier/ engines/spree_pathao_courier/
 COPY engines/spree_courier_manager/ engines/spree_courier_manager/
 COPY engines/spree_ai_engine/ engines/spree_ai_engine/
 COPY engines/spree_instagram_publisher/ engines/spree_instagram_publisher/
+COPY engines/spree_support_ticket/ engines/spree_support_ticket/
 RUN bundle install && \
   rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
   bundle exec bootsnap precompile --gemfile

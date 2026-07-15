@@ -53,7 +53,7 @@
     "cart": "Panier",
     "policies": "Politiques",
     "poweredBy": "Propulse par",
-    "copyright": "\u00a9 {year} {storeName}. Propulse par Spree Commerce."
+    "copyright": "© {year} {storeName}. Propulse par Spree Commerce."
   },
   "home": {
     "welcome": "{storeName} Storefront",
@@ -163,7 +163,7 @@
     "openImageZoom": "Ouvrir le zoom de l'image",
     "priceUnder": "Moins de {price}",
     "priceAbove": "{price}+",
-    "priceRangeBucket": "{min} \u2013 {max}",
+    "priceRangeBucket": "{min} – {max}",
     "properties": "Proprietes",
     "yes": "Oui",
     "no": "Non",
@@ -311,7 +311,8 @@
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "forgotPassword": "Mot de passe oublie ?",
-    "policyConsentRequired": "Vous devez accepter les politiques du magasin pour creer un compte"
+    "policyConsentRequired": "Vous devez accepter les politiques du magasin pour creer un compte",
+    "supportTickets": "Support Tickets"
   },
   "register": {
     "createAccount": "Creer un compte",
@@ -355,7 +356,7 @@
     "paymentInformation": "Informations de paiement",
     "cardEndingIn": "{label} se terminant par {digits}",
     "cardExpires": "Expire le {month}/{year}",
-    "storeCreditApplied": "{amount} applique \u2014 {remaining} restant",
+    "storeCreditApplied": "{amount} applique — {remaining} restant",
     "billingAddress": "Adresse de facturation",
     "orderNotFoundDescription": "La commande que vous recherchez n'existe pas.",
     "storeCredit": "Credit boutique",
@@ -377,7 +378,7 @@
     "notAvailable": "N/D",
     "unknownShipmentStatus": "Inconnu",
     "orderTitle": "Commande #{number}",
-    "shipmentCanceledRefund": "Expedition annulee \u2014 un remboursement a ete emis.",
+    "shipmentCanceledRefund": "Expedition annulee — un remboursement a ete emis.",
     "shippingMethodUnavailable": "Indisponible",
     "totalColumn": "Total"
   },
@@ -417,7 +418,7 @@
     "backToStore": "Retour a la boutique",
     "showOrderSummary": "Afficher le recapitulatif de la commande",
     "hideOrderSummary": "Masquer le recapitulatif de la commande",
-    "allRightsReserved": "\u00a9 {year} {storeName}. Tous droits reserves."
+    "allRightsReserved": "© {year} {storeName}. Tous droits reserves."
   },
   "profile": {
     "profile": "Profil",
@@ -524,5 +525,78 @@
     "shipping": "Livraison",
     "finalizingPayment": "Finalisation du paiement...",
     "or": "ou"
+  },
+  "supportTickets": {
+    "supportTickets": "Tickets de support",
+    "newTicket": "Nouveau ticket",
+    "noTickets": "Aucun ticket de support",
+    "noTicketsDescription": "Vous n'avez pas encore créé de ticket de support.",
+    "createFirstTicket": "Créez votre premier ticket",
+    "activeTicketsCount": "{count} sur {max} tickets actifs",
+    "ticket": "Ticket",
+    "subject": "Sujet",
+    "status": "Statut",
+    "priority": {
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible"
+    },
+    "created": "Créé",
+    "actions": "Actions",
+    "view": "Voir",
+    "subjects": {
+      "order_issue": "Problème de commande",
+      "payment_problem": "Problème de paiement",
+      "delivery_delay": "Retard de livraison",
+      "product_defect": "Défaut du produit",
+      "refund_request": "Demande de remboursement",
+      "account_issue": "Problème de compte",
+      "other": "Autre"
+    },
+    "statuses": {
+      "pending": "En attente",
+      "in_progress": "En cours",
+      "resolved": "Résolu",
+      "ask_for_clarification": "Demande de clarification",
+      "closed": "Fermé"
+    },
+    "createTicket": "Créer un ticket de support",
+    "createTicketDescription": "Décrivez votre problème et nous vous répondrons dans un délai de 10 à 16 heures.",
+    "titleLabel": "Titre",
+    "titlePlaceholder": "Brève description de votre problème",
+    "titleRequired": "Le titre est obligatoire",
+    "orderNumberLabel": "Numéro de commande (facultatif)",
+    "orderNumberPlaceholder": "ex. R12345",
+    "orderNumberHelp": "Si votre problème est lié à une commande, veuillez fournir le numéro de commande.",
+    "subjectLabel": "Sujet",
+    "subjectPlaceholder": "Sélectionnez un sujet",
+    "subjectRequired": "Le sujet est obligatoire",
+    "priorityLabel": "Priorité",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décrivez votre problème en détail...",
+    "bodyRequired": "Le message est obligatoire",
+    "imageLabel": "Image (facultatif)",
+    "uploadImage": "Télécharger une image",
+    "imageHelp": "Max 5 Mo. JPG, PNG ou GIF.",
+    "imageTooLarge": "L'image doit être inférieure à 5 Mo",
+    "cancel": "Annuler",
+    "creating": "Création en cours...",
+    "submitTicket": "Envoyer le ticket",
+    "createFailed": "Impossible de créer le ticket de support. Veuillez réessayer.",
+    "ticketCreated": "Ticket créé",
+    "trafficAlert": "En raison d'un trafic élevé, nous vous répondrons dans un délai de 10 à 16 heures. Merci de votre patience.",
+    "ticketNotFound": "Ticket non trouvé",
+    "backToTickets": "Retour aux tickets",
+    "conversation": "Conversation",
+    "you": "Vous",
+    "support": "Équipe de support",
+    "resolutionSummary": "Résumé de la résolution",
+    "actionTaken": "Action effectuée",
+    "addMessage": "Ajouter un message",
+    "sendMessage": "Envoyer le message",
+    "sending": "Envoi en cours...",
+    "sendMessageFailed": "Impossible d'envoyer le message. Veuillez réessayer.",
+    "ticketClosed": "Ce ticket est fermé. Veuillez créer un nouveau ticket si vous avez besoin d'une assistance supplémentaire.",
+    "orderNumber": "Commande"
   }
 }

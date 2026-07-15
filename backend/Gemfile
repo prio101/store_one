@@ -96,3 +96,6 @@ gem 'spree_courier_manager', path: 'engines/spree_courier_manager'
 
 # Instagram Publisher - Publish products to Instagram via Meta Content Publishing API
 gem 'spree_instagram_publisher', path: 'engines/spree_instagram_publisher'
+
+# Support Ticket System - Customer support ticket management
+gem 'spree_support_ticket', path: 'engines/spree_support_ticket'

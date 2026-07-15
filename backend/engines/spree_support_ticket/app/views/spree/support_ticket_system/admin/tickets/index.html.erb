@@ -1,0 +1,102 @@
+<%# frozen_string_literal: true %>
+
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center mt-3">
+    <h5 class="mb-1">Support Tickets</h5>
+    <span class="badge bg-secondary"><%= @tickets.count %> total</span>
+  </div>
+  <div class="card-body">
+    <!-- Filters -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <%= form_tag admin_support_tickets_path, method: :get, class: 'row g-3' do %>
+          <div class="col-md-3 mb-2">
+            <%= text_field_tag :search, params[:search], class: 'form-control', placeholder: 'Search tickets...' %>
+          </div>
+          <div class="col-md-2 mb-2">
+            <%= select_tag :status, options_for_select(
+              Spree::SupportTicket.statuses.map { |k, v| [k.humanize, k] },
+              params[:status]
+            ), include_blank: 'All Statuses', class: 'form-select' %>
+          </div>
+          <div class="col-md-2 mb-2">
+            <%= select_tag :priority, options_for_select(
+              Spree::SupportTicket.priorities.map { |k, v| [k.humanize, k] },
+              params[:priority]
+            ), include_blank: 'All Priorities', class: 'form-select' %>
+          </div>
+          <div class="flex flex-1 mb-2">
+            <div class="flex-1 gap-2">
+              <%= submit_tag 'Filter', class: 'btn btn-primary' %>
+            </div>
+            <div class="flex flex-1 gap-2 justify-end">
+              <%= link_to 'Clear', admin_support_tickets_path, class: 'btn btn-secondary' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <% if @tickets.any? %>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Title</th>
+            <th>Order</th>
+            <th>User</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Assigned To</th>
+            <th>Created</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tickets.each do |ticket| %>
+            <tr>
+              <td><%= link_to ticket.ticket_number, admin_support_ticket_path(ticket) %></td>
+              <td><%= truncate(ticket.title, length: 40) %></td>
+              <td><%= ticket.order_number %></td>
+              <td><%= ticket.user.email %></td>
+              <td><span class="badge bg-info"><%= ticket.subject.humanize %></span></td>
+              <td>
+                <% case ticket.status %>
+                <% when 'pending' %>
+                  <span class="p-2 badge bg-red-50 text-dark">Pending</span>
+                <% when 'in_progress' %>
+                  <span class="p-2 badge bg-sky-50 text-dark">In Progress</span>
+                <% when 'resolved' %>
+                  <span class="p-2 badge bg-green-100 text-dark">Resolved</span>
+                <% when 'ask_for_more_clarification' %>
+                  <span class="p-2 badge bg-amber-50 text-dark">Ask for Clarification</span>
+                <% when 'closed' %>
+                  <span class="p-2 badge bg-gray-900 text-dark">Closed</span>
+                <% end %>
+              </td>
+              <td>
+                <% case ticket.priority %>
+                <% when 'high' %>
+                  <span class="p-2 badge bg-danger text-white">High</span>
+                <% when 'medium' %>
+                  <span class="p-2 badge bg-warning text-white">Medium</span>
+                <% when 'low' %>
+                  <span class="p-2 badge bg-secondary text-white">Low</span>
+                <% end %>
+              </td>
+              <td><%= ticket.assigned_to&.full_name || 'Unassigned' %></td>
+              <td><%= ticket.created_at.strftime('%b %d, %Y %H:%M') %></td>
+              <td>
+                <%= link_to 'View', admin_support_ticket_path(ticket), class: 'btn btn-primary btn-sm' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="border border-secondary text-center p-3 text-muted mb-0">No support tickets found.</p>
+    <% end %>
+  </div>
+</div>
