@@ -39,11 +39,6 @@ export function CategoryCard({ category, basePath }: CategoryCardProps) {
         <h3 className="text-lg md:text-xl font-bold text-white mb-1">
           {category.name}
         </h3>
-        {category.products_count !== undefined && (
-          <p className="text-sm text-white/80 mb-3">
-            {category.products_count} Products
-          </p>
-        )}
         <span className="inline-flex items-center gap-1 text-sm font-medium text-white group-hover:text-coral-300 transition-colors">
           Shop Now
           <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
