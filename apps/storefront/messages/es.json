@@ -56,8 +56,8 @@
     "copyright": "© {year} {storeName}. Impulsado por Spree Commerce."
   },
   "home": {
-    "welcome": "{storeName} Storefront",
-    "heroDescription": "Un storefront de código abierto listo para producción, construido con Next.js, React y el SDK TypeScript de Spree. Alójalo tú mismo. Tu stack. Sin dependencia de proveedores. Sin comisiones de plataforma.",
+    "welcome": "{storeName}",
+    "heroDescription": "Todo lo que tu pequeño necesita, seleccionado con amor",
     "shopNow": "Ver todo",
     "forkOnGithub": "Fork en GitHub",
     "quickstartGuide": "Guía de inicio rápido",
@@ -68,7 +68,18 @@
     "fastShipping": "Envio rapido",
     "shippingDescription": "Entrega rapida y fiable hasta tu puerta.",
     "support": "Soporte 24/7",
-    "supportDescription": "Nuestro equipo esta aqui para ayudarte en cualquier momento."
+    "supportDescription": "Nuestro equipo esta aqui para ayudarte en cualquier momento.",
+    "newArrivals": "Novedades",
+    "trustBar": {
+      "freeShipping": "Envío gratis",
+      "freeShippingDesc": "En pedidos superiores a 50 €",
+      "easyReturns": "Devoluciones fáciles",
+      "easyReturnsDesc": "Política de devolución de 30 días",
+      "secureCheckout": "Pago seguro",
+      "secureCheckoutDesc": "100% pago seguro",
+      "happyParents": "Padres felices",
+      "happyParentsDesc": "Más de 10.000 clientes satisfechos"
+    }
   },
   "cart": {
     "cart": "Carrito",

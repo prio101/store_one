@@ -57,7 +57,7 @@
   },
   "home": {
     "welcome": "{storeName}",
-    "heroDescription": "আপনার শিশুদের জন্য সব প্রয়োজনীয় জিনিস",
+    "heroDescription": "আপনার ছোট্ট প্রাণের জন্য প্রয়োজনীয় সবকিছু, ভালোবাসা দিয়ে বাছাই করা",
     "shopNow": "সব কিনুন",
     "forkOnGithub": "GitHub-এ ফর্ক করুন",
     "quickstartGuide": "কুইকস্টার্ট গাইড",
@@ -68,7 +68,18 @@
     "fastShipping": "দ্রুত শিপিং",
     "shippingDescription": "আপনার দরজায় দ্রুত এবং নির্ভরযোগ্য ডেলিভারি।",
     "support": "২৪/৭ সহায়তা",
-    "supportDescription": "আমাদের দল যেকোনো সময় আপনাকে সাহায্য করতে প্রস্তুত।"
+    "supportDescription": "আমাদের দল যেকোনো সময় আপনাকে সাহায্য করতে প্রস্তুত।",
+    "newArrivals": "নতুন আগমন",
+    "trustBar": {
+      "freeShipping": "বিনামূল্যে শিপিং",
+      "freeShippingDesc": "$৫০ এর বেশি অর্ডারে",
+      "easyReturns": "সহজ রিটার্ন",
+      "easyReturnsDesc": "৩০ দিনের রিটার্ন নীতি",
+      "secureCheckout": "নিরাপদ চেকআউট",
+      "secureCheckoutDesc": "১০০% নিরাপদ পেমেন্ট",
+      "happyParents": "সুখী বাবা-মা",
+      "happyParentsDesc": "১০,০০০+ সন্তুষ্ট গ্রাহক"
+    }
   },
   "cart": {
     "cart": "কার্ট",
