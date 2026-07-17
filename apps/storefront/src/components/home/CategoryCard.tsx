@@ -9,7 +9,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, basePath }: CategoryCardProps) {
-  const imageUrl = category.image?.url || category.images?.[0]?.url;
+  const imageUrl = category.square_image_url || category.image_url;
 
   return (
     <Link
