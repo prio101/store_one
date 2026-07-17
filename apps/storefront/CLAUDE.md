@@ -1,5 +1,9 @@
 # Claude Code Rules for Next.js Spree Storefront
 
+> **Design Guide:** See [DESIGN_GUIDE.md](./DESIGN_GUIDE.md) for the full architectural reference —
+> design tokens, component patterns, data fetching conventions, routing, i18n, analytics,
+> deployment, and quick-modification recipes. Read it before making non-trivial changes.
+
 ## Project Overview
 
 This is a headless e-commerce storefront built with Next.js 16 and React 19, using the Spree Commerce API v3 via `@spree/sdk`.

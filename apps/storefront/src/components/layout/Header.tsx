@@ -1,5 +1,5 @@
 import type { Category } from "@spree/sdk";
-import { User } from "lucide-react";
+import { ChevronDown, User } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,14 +28,22 @@ const LazyCountrySwitcher = dynamic(
     })),
   {
     loading: () => (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400">
-        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-warmgray-400">
+        <div className="w-4 h-4 border-2 border-warmgray-300 border-t-transparent rounded-full animate-spin" />
       </div>
     ),
   },
 );
 
 const storeName = getStoreName();
+
+// Age groups for baby items navigation
+const ageGroups = [
+  { label: "Newborn", range: "0-3m", href: "0-3m" },
+  { label: "Infant", range: "3-12m", href: "3-12m" },
+  { label: "Toddler", range: "1-3y", href: "1-3y" },
+  { label: "Preschool", range: "3-5y", href: "3-5y" },
+];
 
 interface HeaderProps {
   rootCategories: Category[];
@@ -71,7 +79,7 @@ export async function Header({
         </Link>
       }
       rightStart={
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-1">
           <LazyCountrySwitcher />
         </div>
       }
@@ -89,6 +97,34 @@ export async function Header({
           {/* Cart */}
           <CartButton />
         </>
+      }
+      ageNavigation={
+        <div className="hidden lg:block border-b border-warmgray-200 bg-warmgray-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex items-center justify-center gap-1 py-2" aria-label="Shop by age">
+              <span className="text-sm font-medium text-warmgray-600 mr-3">
+                Shop by Age:
+              </span>
+              {ageGroups.map((group) => (
+                <Link
+                  key={group.href}
+                  href={`${basePath}/products?age=${group.href}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-warmgray-700 hover:text-coral-600 hover:bg-coral-50 rounded-full transition-colors"
+                >
+                  {group.label}
+                  <span className="text-xs text-warmgray-400">{group.range}</span>
+                </Link>
+              ))}
+              <Link
+                href={`${basePath}/products`}
+                className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-coral-600 hover:bg-coral-50 rounded-full transition-colors"
+              >
+                All Products
+                <ChevronDown className="w-3 h-3" />
+              </Link>
+            </nav>
+          </div>
+        </div>
       }
     />
   );

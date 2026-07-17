@@ -5,113 +5,191 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================
-   COLOR THEME: Peach, Warm Blue, White, Black
+   COLOR THEME: Soft Nursery (Baby Items Ecommerce)
+   Version: 2.0.0
    ============================================ */
 
 :root {
-  /* Peach Palette */
-  --peach-50: #FFF8F5;
-  --peach-100: #FFEDE6;
-  --peach-200: #FFD9CC;
-  --peach-300: #FFC4B3;
-  --peach-400: #FFAA8C;
-  --peach-500: #FF9166;
-  --peach-600: #E87D52;
-  --peach-700: #D66940;
-  --peach-800: #B85633;
-  --peach-900: #8C4026;
+  /* ============================================
+     CORAL PALETTE (Primary - Nurturing, Inviting)
+     ============================================ */
+  --coral-50: #FFF5F2;
+  --coral-100: #FFE8E0;
+  --coral-200: #FFD4C7;
+  --coral-300: #FFB8A3;
+  --coral-400: #FF9B7E;
+  --coral-500: #FF7F5C;
+  --coral-600: #E86A47;
+  --coral-700: #D05635;
+  --coral-800: #B84528;
+  --coral-900: #9A3A20;
 
-  /* Warm Blue Palette */
-  --warmblue-50: #F0F7FF;
-  --warmblue-100: #E0EFFF;
-  --warmblue-200: #C7E0FF;
-  --warmblue-300: #A3CBFF;
-  --warmblue-400: #7BB5FF;
-  --warmblue-500: #5B9BD5;
-  --warmblue-600: #4A86C0;
-  --warmblue-700: #3A72AB;
-  --warmblue-800: #2D5A8A;
-  --warmblue-900: #1F4269;
+  /* ============================================
+     SAGE PALETTE (Secondary - Calm, Natural)
+     ============================================ */
+  --sage-50: #F4F9F4;
+  --sage-100: #E6F2E6;
+  --sage-200: #CDE6CD;
+  --sage-300: #A8D4A8;
+  --sage-400: #7FBD7F;
+  --sage-500: #5FA65F;
+  --sage-600: #4D8A4D;
+  --sage-700: #3D6E3D;
+  --sage-800: #335933;
+  --sage-900: #2A4A2A;
 
-  /* Gray Palette */
-  --gray-50: #FAFAFA;
-  --gray-100: #F5F5F5;
-  --gray-200: #E5E5E5;
-  --gray-300: #D4D4D4;
-  --gray-400: #A3A3A3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
+  /* ============================================
+     LAVENDER PALETTE (Accent - Playful, Childlike)
+     ============================================ */
+  --lavender-50: #F8F5FC;
+  --lavender-100: #F0EAF9;
+  --lavender-200: #E0D5F3;
+  --lavender-300: #C9B8E8;
+  --lavender-400: #B099DB;
+  --lavender-500: #967BC9;
+  --lavender-600: #7F62B5;
+  --lavender-700: #6B4FA1;
+  --lavender-800: #5A4285;
+  --lavender-900: #4A366B;
 
-  /* Semantic Tokens */
-  --background: #FFFFFF;
-  --foreground: #0F0F0F;
+  /* ============================================
+     WARM GRAY PALETTE (Neutral - Soft, Not Cold)
+     ============================================ */
+  --warmgray-50: #FAF9F8;
+  --warmgray-100: #F5F3F1;
+  --warmgray-200: #ECE9E5;
+  --warmgray-300: #DDD9D3;
+  --warmgray-400: #B8B2A9;
+  --warmgray-500: #938C82;
+  --warmgray-600: #756E65;
+  --warmgray-700: #5C5650;
+  --warmgray-800: #443F3B;
+  --warmgray-900: #2E2A27;
+
+  /* ============================================
+     BABY-SPECIFIC COLORS
+     ============================================ */
+  --baby-pink: #FFD1DC;
+  --baby-blue: #B8D4E3;
+  --baby-yellow: #FFF3CD;
+  --baby-mint: #D1ECF1;
+  --baby-lavender: #E8DAEF;
+
+  /* ============================================
+     SEMANTIC TOKENS - Light Mode
+     ============================================ */
+  --background: var(--warmgray-50);
+  --foreground: var(--warmgray-900);
+
   --card: #FFFFFF;
-  --card-foreground: #0F0F0F;
+  --card-foreground: var(--warmgray-900);
+
   --popover: #FFFFFF;
-  --popover-foreground: #0F0F0F;
-  --primary: #FF9166;
+  --popover-foreground: var(--warmgray-900);
+
+  /* Primary: Coral - nurturing, inviting, action-oriented */
+  --primary: var(--coral-500);
   --primary-foreground: #FFFFFF;
-  --secondary: #5B9BD5;
+
+  /* Secondary: Sage - trustworthy, natural */
+  --secondary: var(--sage-500);
   --secondary-foreground: #FFFFFF;
-  --muted: #F5F5F5;
-  --muted-foreground: #525252;
-  --accent: #FFEDE6;
-  --accent-foreground: #B85633;
+
+  /* Muted: Soft neutrals */
+  --muted: var(--warmgray-100);
+  --muted-foreground: var(--warmgray-600);
+
+  /* Accent: Light lavender for highlights */
+  --accent: var(--lavender-100);
+  --accent-foreground: var(--lavender-800);
+
+  /* Destructive: Red for errors/warnings */
   --destructive: #DC2626;
-  --border: #E5E5E5;
-  --input: #E5E5E5;
-  --ring: #FFAA8C;
-  --chart-1: #FFAA8C;
-  --chart-2: #7BB5FF;
-  --chart-3: #E87D52;
-  --chart-4: #4A86C0;
-  --chart-5: #B85633;
-  --radius: 0.625rem;
-  --sidebar: #FAFAFA;
-  --sidebar-foreground: #0F0F0F;
-  --sidebar-primary: #FF9166;
+  --destructive-foreground: #FFFFFF;
+
+  /* Success & Warning */
+  --success: var(--sage-500);
+  --success-foreground: #FFFFFF;
+  --warning: #F59E0B;
+  --warning-foreground: #FFFFFF;
+
+  /* Borders & Inputs */
+  --border: var(--warmgray-200);
+  --input: var(--warmgray-200);
+  --ring: var(--coral-400);
+
+  /* Chart colors */
+  --chart-1: var(--coral-400);
+  --chart-2: var(--sage-400);
+  --chart-3: var(--lavender-400);
+  --chart-4: var(--coral-600);
+  --chart-5: var(--sage-600);
+
+  /* Sidebar */
+  --sidebar: var(--warmgray-50);
+  --sidebar-foreground: var(--warmgray-900);
+  --sidebar-primary: var(--coral-500);
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFEDE6;
-  --sidebar-accent-foreground: #B85633;
-  --sidebar-border: #E5E5E5;
-  --sidebar-ring: #FFAA8C;
+  --sidebar-accent: var(--coral-50);
+  --sidebar-accent-foreground: var(--coral-800);
+  --sidebar-border: var(--warmgray-200);
+  --sidebar-ring: var(--coral-400);
+
+  /* Radius (softer, more rounded for baby aesthetic) */
+  --radius: 0.625rem;
 }
 
+/*
+ * Dark mode: Deep coral and sage on dark backgrounds
+ */
 .dark {
-  --background: #171717;
+  --background: var(--warmgray-900);
   --foreground: #FFFFFF;
-  --card: #262626;
+
+  --card: var(--warmgray-800);
   --card-foreground: #FFFFFF;
-  --popover: #262626;
+
+  --popover: var(--warmgray-800);
   --popover-foreground: #FFFFFF;
-  --primary: #FFAA8C;
-  --primary-foreground: #171717;
-  --secondary: #7BB5FF;
-  --secondary-foreground: #171717;
-  --muted: #262626;
-  --muted-foreground: #A3A3A3;
-  --accent: #8C4026;
-  --accent-foreground: #FFEDE6;
+
+  --primary: var(--coral-400);
+  --primary-foreground: var(--warmgray-900);
+
+  --secondary: var(--sage-400);
+  --secondary-foreground: var(--warmgray-900);
+
+  --muted: var(--warmgray-800);
+  --muted-foreground: var(--warmgray-400);
+
+  --accent: var(--lavender-900);
+  --accent-foreground: var(--lavender-100);
+
   --destructive: #EF4444;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #FF9166;
-  --chart-1: #FFAA8C;
-  --chart-2: #7BB5FF;
-  --chart-3: #E87D52;
-  --chart-4: #4A86C0;
-  --chart-5: #B85633;
-  --sidebar: #171717;
+  --destructive-foreground: #FFFFFF;
+
+  --success: var(--sage-400);
+  --success-foreground: var(--warmgray-900);
+  --warning: #FBBF24;
+  --warning-foreground: var(--warmgray-900);
+
+  --border: var(--warmgray-700);
+  --input: var(--warmgray-700);
+  --ring: var(--coral-500);
+
+  --chart-1: var(--coral-400);
+  --chart-2: var(--sage-400);
+  --chart-3: var(--lavender-400);
+  --chart-4: var(--coral-600);
+  --chart-5: var(--sage-600);
+
+  --sidebar: var(--warmgray-900);
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #FFAA8C;
-  --sidebar-primary-foreground: #171717;
-  --sidebar-accent: #262626;
-  --sidebar-accent-foreground: #FFEDE6;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #FF9166;
+  --sidebar-primary: var(--coral-400);
+  --sidebar-primary-foreground: var(--warmgray-900);
+  --sidebar-accent: var(--warmgray-800);
+  --sidebar-accent-foreground: var(--coral-100);
+  --sidebar-border: var(--warmgray-700);
+  --sidebar-ring: var(--coral-500);
 }
 
 @theme inline {
@@ -119,41 +197,60 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist);
 
-  /* Peach Colors */
-  --color-peach-50: var(--peach-50);
-  --color-peach-100: var(--peach-100);
-  --color-peach-200: var(--peach-200);
-  --color-peach-300: var(--peach-300);
-  --color-peach-400: var(--peach-400);
-  --color-peach-500: var(--peach-500);
-  --color-peach-600: var(--peach-600);
-  --color-peach-700: var(--peach-700);
-  --color-peach-800: var(--peach-800);
-  --color-peach-900: var(--peach-900);
+  /* Coral Colors (Primary) */
+  --color-coral-50: var(--coral-50);
+  --color-coral-100: var(--coral-100);
+  --color-coral-200: var(--coral-200);
+  --color-coral-300: var(--coral-300);
+  --color-coral-400: var(--coral-400);
+  --color-coral-500: var(--coral-500);
+  --color-coral-600: var(--coral-600);
+  --color-coral-700: var(--coral-700);
+  --color-coral-800: var(--coral-800);
+  --color-coral-900: var(--coral-900);
 
-  /* Warm Blue Colors */
-  --color-warmblue-50: var(--warmblue-50);
-  --color-warmblue-100: var(--warmblue-100);
-  --color-warmblue-200: var(--warmblue-200);
-  --color-warmblue-300: var(--warmblue-300);
-  --color-warmblue-400: var(--warmblue-400);
-  --color-warmblue-500: var(--warmblue-500);
-  --color-warmblue-600: var(--warmblue-600);
-  --color-warmblue-700: var(--warmblue-700);
-  --color-warmblue-800: var(--warmblue-800);
-  --color-warmblue-900: var(--warmblue-900);
+  /* Sage Colors (Secondary) */
+  --color-sage-50: var(--sage-50);
+  --color-sage-100: var(--sage-100);
+  --color-sage-200: var(--sage-200);
+  --color-sage-300: var(--sage-300);
+  --color-sage-400: var(--sage-400);
+  --color-sage-500: var(--sage-500);
+  --color-sage-600: var(--sage-600);
+  --color-sage-700: var(--sage-700);
+  --color-sage-800: var(--sage-800);
+  --color-sage-900: var(--sage-900);
 
-  /* Gray Colors */
-  --color-gray-50: var(--gray-50);
-  --color-gray-100: var(--gray-100);
-  --color-gray-200: var(--gray-200);
-  --color-gray-300: var(--gray-300);
-  --color-gray-400: var(--gray-400);
-  --color-gray-500: var(--gray-500);
-  --color-gray-600: var(--gray-600);
-  --color-gray-700: var(--gray-700);
-  --color-gray-800: var(--gray-800);
-  --color-gray-900: var(--gray-900);
+  /* Lavender Colors (Accent) */
+  --color-lavender-50: var(--lavender-50);
+  --color-lavender-100: var(--lavender-100);
+  --color-lavender-200: var(--lavender-200);
+  --color-lavender-300: var(--lavender-300);
+  --color-lavender-400: var(--lavender-400);
+  --color-lavender-500: var(--lavender-500);
+  --color-lavender-600: var(--lavender-600);
+  --color-lavender-700: var(--lavender-700);
+  --color-lavender-800: var(--lavender-800);
+  --color-lavender-900: var(--lavender-900);
+
+  /* Warm Gray Colors (Neutral) */
+  --color-warmgray-50: var(--warmgray-50);
+  --color-warmgray-100: var(--warmgray-100);
+  --color-warmgray-200: var(--warmgray-200);
+  --color-warmgray-300: var(--warmgray-300);
+  --color-warmgray-400: var(--warmgray-400);
+  --color-warmgray-500: var(--warmgray-500);
+  --color-warmgray-600: var(--warmgray-600);
+  --color-warmgray-700: var(--warmgray-700);
+  --color-warmgray-800: var(--warmgray-800);
+  --color-warmgray-900: var(--warmgray-900);
+
+  /* Baby Colors */
+  --color-baby-pink: var(--baby-pink);
+  --color-baby-blue: var(--baby-blue);
+  --color-baby-yellow: var(--baby-yellow);
+  --color-baby-mint: var(--baby-mint);
+  --color-baby-lavender: var(--baby-lavender);
 
   /* Semantic Colors */
   --color-primary: var(--primary);
@@ -165,9 +262,16 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Card & Popover */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -190,7 +294,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Border Radius */
+  /* Border Radius (softer for baby aesthetic) */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -205,7 +309,9 @@
   --animate-slide-in-bottom: slide-in-bottom 0.3s ease-out;
   --animate-slide-in-top: slide-in-top 0.3s ease-out;
   --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-fade-in-up: fade-in-up 0.4s ease-out;
   --animate-scale-up: scale-up 0.2s ease-out;
+  --animate-badge-bounce: badge-bounce 0.3s ease-out;
   --animate-hamburger-top-open: hamburger-top-open 0.35s ease-in-out forwards;
   --animate-hamburger-top-close: hamburger-top-close 0.35s ease-in-out forwards;
   --animate-hamburger-mid-open: hamburger-mid-open 0.15s ease-in-out forwards;
@@ -271,6 +377,17 @@
   }
 }
 
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes scale-up {
   from {
     transform: scale(0.95);
@@ -279,6 +396,15 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes badge-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
   }
 }
 
@@ -316,6 +442,33 @@
   100% { transform: translateY(0) rotate(0); }
 }
 
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ============================================
    BASE STYLES
    ============================================ */
@@ -325,6 +478,8 @@ body {
   font-weight: 400;
   background-color: var(--background);
   color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 input[type="search"]::-webkit-search-cancel-button {
@@ -334,9 +489,13 @@ input[type="search"]::-webkit-search-cancel-button {
   width: 14px;
   padding: 8px;
   box-sizing: content-box;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E") center/14px 14px no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23938C82' stroke-width='2' stroke-linecap='round'%3E%3Cline x1='18' y1='6' x2='6' y2='18'/%3E%3Cline x1='6' y1='6' x2='18' y2='18'/%3E%3C/svg%3E") center/14px 14px no-repeat;
   cursor: pointer;
 }
+
+/* ============================================
+   PRODUCT CAROUSEL
+   ============================================ */
 
 .product-carousel .swiper-button-next,
 .product-carousel .swiper-button-prev {
@@ -372,105 +531,6 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 /* ============================================
-   COMPONENT STYLES
-   ============================================ */
-
-.btn-primary {
-  background-color: var(--peach-500);
-  color: var(--white);
-  transition: all 0.2s ease;
-}
-.btn-primary:hover {
-  background-color: var(--peach-600);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 145, 102, 0.3);
-}
-
-.btn-secondary {
-  background-color: var(--warmblue-500);
-  color: var(--white);
-  transition: all 0.2s ease;
-}
-.btn-secondary:hover {
-  background-color: var(--warmblue-600);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(91, 155, 213, 0.3);
-}
-
-.card {
-  background-color: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
-}
-.card:hover {
-  border-color: var(--peach-300);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-.product-card {
-  background-color: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-.product-card:hover {
-  border-color: var(--peach-300);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-  transform: translateY(-4px);
-}
-
-.input-field {
-  background-color: var(--white);
-  border: 1px solid var(--gray-300);
-  color: var(--black);
-  transition: all 0.2s ease;
-}
-.input-field:focus {
-  border-color: var(--peach-400);
-  box-shadow: 0 0 0 3px rgba(255, 145, 102, 0.15);
-  outline: none;
-}
-
-.badge-peach {
-  background-color: var(--peach-100);
-  color: var(--peach-700);
-}
-.badge-blue {
-  background-color: var(--warmblue-100);
-  color: var(--warmblue-700);
-}
-
-.link-primary {
-  color: var(--peach-500);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 0.2s ease;
-}
-.link-primary:hover {
-  color: var(--peach-700);
-}
-
-.link-secondary {
-  color: var(--warmblue-500);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: color 0.2s ease;
-}
-.link-secondary:hover {
-  color: var(--warmblue-700);
-}
-
-.hover-lift {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* ============================================
    SCROLLBAR STYLES
    ============================================ */
 
@@ -479,14 +539,14 @@ input[type="search"]::-webkit-search-cancel-button {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--gray-100);
+  background: var(--warmgray-100);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-300);
+  background: var(--warmgray-300);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-400);
+  background: var(--warmgray-400);
 }
 
 /* ============================================
@@ -494,8 +554,8 @@ input[type="search"]::-webkit-search-cancel-button {
    ============================================ */
 
 ::selection {
-  background-color: var(--peach-200);
-  color: var(--black);
+  background-color: var(--coral-200);
+  color: var(--warmgray-900);
 }
 
 @layer base {
@@ -503,12 +563,12 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply border-border;
   }
   :focus-visible {
-    outline: 2px solid var(--peach-400);
+    outline: 2px solid var(--coral-400);
     outline-offset: 2px;
   }
   @media (prefers-color-scheme: dark) {
     :focus-visible {
-      outline-color: var(--peach-500);
+      outline-color: var(--coral-500);
     }
   }
   body {
@@ -516,5 +576,19 @@ input[type="search"]::-webkit-search-cancel-button {
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

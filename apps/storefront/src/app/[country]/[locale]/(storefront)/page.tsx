@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FeaturedProductsSection } from "@/components/home/FeaturedProductsSection";
 import { HeroSection } from "@/components/home/HeroSection";
+import { TrustBar } from "@/components/home/TrustBar";
 import { getMarkets, resolveCurrency } from "@/lib/data/markets";
 import { generateHomeMetadata } from "@/lib/metadata/home";
 import { getDefaultCountry, getDefaultLocale } from "@/lib/store";
@@ -76,6 +77,7 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <div>
       <HeroSection basePath={basePath} locale={locale} />
+      <TrustBar locale={locale} />
       <FeaturedProductsSection
         basePath={basePath}
         locale={locale}
