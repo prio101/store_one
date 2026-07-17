@@ -1,4 +1,5 @@
 import { Baby, Gift, Shirt, UtensilsCrossed } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
@@ -26,9 +27,31 @@ export async function HeroSection({ basePath, locale }: HeroSectionProps) {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-coral-50 via-white to-lavender-50">
-      {/* Decorative elements */}
+      {/* Decorative blur elements */}
       <div className="absolute top-10 left-10 w-64 h-64 bg-coral-100 rounded-full blur-3xl opacity-50" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-lavender-100 rounded-full blur-3xl opacity-50" />
+
+      {/* Animal silhouette backgrounds - decorative, non-interactive */}
+      <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        {/* Left side - Coral tinted */}
+        <Image
+          src="/animal-silhouettes-1.svg"
+          alt=""
+          width={600}
+          height={600}
+          className="absolute -left-20 top-1/2 -translate-y-1/2 text-coral-200 opacity-40 hidden lg:block"
+          priority={false}
+        />
+        {/* Right side - Lavender tinted */}
+        <Image
+          src="/animal-silhouettes-2.svg"
+          alt=""
+          width={600}
+          height={600}
+          className="absolute -right-20 top-1/2 -translate-y-1/2 text-lavender-200 opacity-40 hidden lg:block"
+          priority={false}
+        />
+      </div>
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 lg:py-28">
         <div className="max-w-4xl mx-auto text-center">
