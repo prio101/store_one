@@ -6,7 +6,7 @@ interface TrustBarProps {
 }
 
 export async function TrustBar({ locale }: TrustBarProps) {
-  const t = await getTranslations({ locale, namespace: "home.trustBar" });
+  const t = await getTranslations({ locale: locale as Locale, namespace: "home.trustBar" });
 
   const trustItems = [
     {

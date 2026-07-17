@@ -69,15 +69,15 @@ export const ProductCard = memo(function ProductCard({
 
   // Get age range from custom fields or categories
   const ageRange = product.custom_fields?.find(
-    (field) => field.name === "age_range",
+    (field) => field.key === "age_range",
   )?.value;
 
   // Get rating from custom fields
   const rating = product.custom_fields?.find(
-    (field) => field.name === "rating",
+    (field) => field.key === "rating",
   )?.value;
   const reviewCount = product.custom_fields?.find(
-    (field) => field.name === "review_count",
+    (field) => field.key === "review_count",
   )?.value;
 
   return (
